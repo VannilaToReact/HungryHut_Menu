@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hungry Hut Menu</title>
+
   <style>
     * {
       margin: 0;
@@ -15,6 +16,7 @@
     body {
       background-color: #fff8f0;
       color: #222;
+      line-height: 1.5;
     }
 
     header {
@@ -35,6 +37,211 @@
       text-align: center;
     }
 
+    .logo {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      background: white;
+      border-radius: 50%;
+      padding: 8px;
+    }
+
+    .brand h1 {
+      font-size: 48px;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .brand h2 {
+      font-size: 22px;
+      letter-spacing: 4px;
+      color: #ffd700;
+      margin-bottom: 12px;
+    }
+
+    .menu-tag {
+      display: inline-block;
+      background: white;
+      color: #8b0000;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 40px 20px 60px;
+      text-align: center;
+    }
+
+    main h3 {
+      font-size: 28px;
+      color: #8b0000;
+      margin-bottom: 30px;
+    }
+
+    .menu-container {
+      width: 95%;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .menu-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease;
+      flex: 1;
+      min-width: 300px;
+      max-width: 650px;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .menu-card img {
+      width: 100%;
+      display: block;
+    }
+
+    footer {
+      background: linear-gradient(135deg, #5c0000, #a00000);
+      color: white;
+      padding: 25px 20px;
+      border-top: 4px solid gold;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-box {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .footer-box h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      color: #ffd700;
+    }
+
+    .footer-box p {
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .phone {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ffd700;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 768px) {
+      .header-container,
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .logo {
+        width: 80px;
+        height: 80px;
+      }
+
+      .brand h1 {
+        font-size: 34px;
+      }
+
+      .brand h2 {
+        font-size: 18px;
+        letter-spacing: 2px;
+      }
+
+      .menu-tag {
+        font-size: 13px;
+        padding: 8px 16px;
+      }
+
+      .phone {
+        font-size: 22px;
+      }
+
+      .footer-box p {
+        font-size: 15px;
+      }
+
+      .menu-card {
+        min-width: 95%;
+      }
+
+      main h3 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <img src="logo.png" alt="Hungry Hut Logo" class="logo" />
+      <div class="brand">
+        <h1>Hungry Hut</h1>
+        <h2>RESTAURANT &amp; CAFE</h2>
+        <div class="menu-tag">TIFFINS • BIRYANI • IRANI CHAI • SNACKS</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <h3>Welcome to Hungry Hut Menu</h3>
+
+    <div class="menu-container">
+      <div class="menu-card">
+        <img src="Hut.jpeg" alt="Menu Page 1" />
+      </div>
+
+      <div class="menu-card">
+        <img src="Hut1.jpeg" alt="Menu Page 2" />
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-box">
+        <h3>Visit Us</h3>
+        <p>
+          📍 Near K. R. R. School<br />
+          Kurnool to Nandyal Road,<br />
+          Panyam
+        </p>
+      </div>
+
+      <div class="footer-box">
+        <h3>Call Us</h3>
+        <p class="phone">
+          📞 85559 38190<br />
+          63044 54153
+        </p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
     .logo {
       width: 100px;
       height: 100px;
