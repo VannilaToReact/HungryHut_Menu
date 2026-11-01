@@ -542,13 +542,6 @@ const API_BASE = (function () {
   if (typeof window === 'undefined') return '';
   if (window.VITE_API_BASE_URL) return window.VITE_API_BASE_URL.replace(/\/$/, '');
   if (window.HUNGRYHUT_API_BASE_URL) return window.HUNGRYHUT_API_BASE_URL.replace(/\/$/, '');
-  
-  // Environment variable support for Vite/bundlers if ever bundled
-  try {
-    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) {
-      return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
-    }
-  } catch (e) {}
 
   const host = window.location.hostname || '';
   // Default to deployed Vercel production API for GitHub Pages, remote hosts, and local file preview
@@ -998,3 +991,18 @@ const MenuService = {
     return { ...DEFAULT_THEME_DATA };
   }
 };
+
+// Expose MenuService, DEFAULT_MENU_DATA, and configuration globally across all scopes
+if (typeof window !== 'undefined') {
+  window.MenuService = MenuService;
+  window.DEFAULT_MENU_DATA = DEFAULT_MENU_DATA;
+  window.DEFAULT_THEME_DATA = DEFAULT_THEME_DATA;
+  window.DEFAULT_FOOTER_DATA = DEFAULT_FOOTER_DATA;
+}
+if (typeof global !== 'undefined') {
+  global.MenuService = MenuService;
+  global.DEFAULT_MENU_DATA = DEFAULT_MENU_DATA;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { MenuService, DEFAULT_MENU_DATA, DEFAULT_THEME_DATA, DEFAULT_FOOTER_DATA };
+}

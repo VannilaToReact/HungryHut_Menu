@@ -127,6 +127,8 @@
   // DOM Elements Cache
   const elements = {
     headerBrand: document.getElementById('headerBrand'),
+    headerAdminQuickBtn: document.getElementById('headerAdminQuickBtn'),
+    catNavAdminBtn: document.getElementById('catNavAdminBtn'),
     adminToolbar: document.getElementById('adminToolbar'),
     adminLoggedInEmailDisplay: document.getElementById('adminLoggedInEmailDisplay'),
     adminLogoutBtn: document.getElementById('adminLogoutBtn'),
@@ -527,6 +529,16 @@
     elements.categoryNavBar.addEventListener('click', (e) => {
       const pill = e.target.closest('.cat-pill');
       if (!pill) return;
+
+      if (pill.id === 'catNavAdminBtn' || pill.classList.contains('cat-pill-admin')) {
+        if (!state.isAdmin) {
+          openLoginModal();
+        } else {
+          showToast('👑 Admin Mode is active! Manage products using toolbar.', 'ℹ️');
+          if (elements.adminToolbar) elements.adminToolbar.scrollIntoView({ behavior: 'smooth' });
+        }
+        return;
+      }
 
       elements.categoryNavBar.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
@@ -1500,15 +1512,25 @@
   // ==========================================================================
 
   function openLoginModal() {
-    elements.loginForm.reset();
-    elements.loginErrorMsg.style.display = 'none';
-    elements.loginEmailInput.value = MenuService.getStoredAdminEmail();
-    elements.loginModal.classList.add('active');
-    elements.loginPasswordInput.focus();
+    if (elements.loginForm) elements.loginForm.reset();
+    if (elements.loginErrorMsg) elements.loginErrorMsg.style.display = 'none';
+    if (elements.loginEmailInput) elements.loginEmailInput.value = MenuService.getStoredAdminEmail();
+    if (elements.loginModal) {
+      elements.loginModal.classList.add('active');
+      elements.loginModal.style.display = 'flex';
+    }
+    setTimeout(() => {
+      if (elements.loginPasswordInput) {
+        try { elements.loginPasswordInput.focus(); } catch (e) {}
+      }
+    }, 150);
   }
 
   function closeLoginModal() {
-    elements.loginModal.classList.remove('active');
+    if (elements.loginModal) {
+      elements.loginModal.classList.remove('active');
+      elements.loginModal.style.display = 'none';
+    }
   }
 
   async function handleLoginSubmit(e) {
@@ -1561,6 +1583,19 @@
   // ==========================================================================
 
   function bindEvents() {
+    // Header Quick Admin Button
+    if (elements.headerAdminQuickBtn) {
+      elements.headerAdminQuickBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!state.isAdmin) {
+          openLoginModal();
+        } else {
+          showToast('👑 Admin Mode is active! Manage products, theme, and account using toolbar.', 'ℹ️');
+          if (elements.adminToolbar) elements.adminToolbar.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+
     // Header Brand Click -> Admin Portal or highlight toolbar
     elements.headerBrand.addEventListener('click', () => {
       if (!state.isAdmin) {
@@ -1686,6 +1721,9 @@
         if (!state.isAdmin) {
           openLoginModal();
         } else {
+          if (elements.adminToolbar) {
+            elements.adminToolbar.scrollIntoView({ behavior: 'smooth' });
+          }
           openCredentialsModal();
         }
       });
