@@ -558,19 +558,18 @@
   </nav>
 
   <!-- Scripts -->
-  <!-- API Base URL: set window.HUNGRYHUT_API_BASE_URL to your Vercel deployment URL -->
+  <!-- API Base URL: Production Vercel Serverless API -->
   <script>
-    // Production: https://hungryhut-api.vercel.app  (update after Vercel deployment)
-    // Leave empty on localhost — menuData.js resolves it automatically.
-    window.HUNGRYHUT_API_BASE_URL = 'https://hungryhut-api.vercel.app';
+    window.VITE_API_BASE_URL = 'https://hungryhutmenu-api-service.vercel.app';
+    window.HUNGRYHUT_API_BASE_URL = 'https://hungryhutmenu-api-service.vercel.app';
   </script>
   <!-- Socket.IO loaded from Vercel API on production, or local server on dev -->
   <script>
     (function() {
       var s = document.createElement('script');
-      var apiBase = window.HUNGRYHUT_API_BASE_URL || '';
+      var apiBase = window.VITE_API_BASE_URL || window.HUNGRYHUT_API_BASE_URL || '';
       s.src = apiBase ? apiBase + '/socket.io/socket.io.js' : '/socket.io/socket.io.js';
-      s.onerror = function() { console.info('Socket.IO not available — polling mode active.'); };
+      s.onerror = function() { console.info('Socket.IO optional – automated 12s polling active.'); };
       document.head.appendChild(s);
     })();
   </script>

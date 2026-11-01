@@ -400,6 +400,7 @@
         state.items = items;
         renderMenu();
         setupCategoryDropdown();
+        updateLiveSyncBadge(true);
       }
 
       const theme = await MenuService.fetchTheme();
@@ -414,6 +415,7 @@
       }
     } catch (e) {
       console.warn('Could not refresh cloud data:', e);
+      updateLiveSyncBadge(false);
     }
   }
 
@@ -476,10 +478,15 @@
     async function pollForChanges() {
       try {
         const result = await MenuService.checkForChanges();
-        if (result && result.changed === true) {
-          await refreshCloudData();
+        if (result && result.success) {
+          updateLiveSyncBadge(true);
+          if (result.changed === true) {
+            await refreshCloudData();
+          }
         }
-      } catch (e) { /* network hiccup – ignore */ }
+      } catch (e) {
+        updateLiveSyncBadge(false);
+      }
     }
 
     function startPolling() {

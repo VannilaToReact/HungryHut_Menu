@@ -536,14 +536,24 @@ const DEFAULT_THEME_DATA = {
 
 /**
  * Resolve the backend API base URL.
- * Priority: window.HUNGRYHUT_API_BASE_URL (set in index.html) → GitHub Pages fallback → relative (localhost).
+ * Supports: window.VITE_API_BASE_URL, window.HUNGRYHUT_API_BASE_URL, or direct GitHub Pages production URL.
  */
 const API_BASE = (function () {
   if (typeof window === 'undefined') return '';
+  if (window.VITE_API_BASE_URL) return window.VITE_API_BASE_URL.replace(/\/$/, '');
   if (window.HUNGRYHUT_API_BASE_URL) return window.HUNGRYHUT_API_BASE_URL.replace(/\/$/, '');
-  const host = window.location.hostname;
-  if (host.includes('github.io') || host.includes('vannilatoreact')) {
-    return 'https://hungryhut-api.vercel.app';
+  
+  // Environment variable support for Vite/bundlers if ever bundled
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) {
+      return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
+    }
+  } catch (e) {}
+
+  const host = window.location.hostname || '';
+  // Default to deployed Vercel production API for GitHub Pages, remote hosts, and local file preview
+  if (host.includes('github.io') || host.includes('vannilatoreact') || host === '' || window.location.protocol === 'file:') {
+    return 'https://hungryhutmenu-api-service.vercel.app';
   }
   return '';
 })();
