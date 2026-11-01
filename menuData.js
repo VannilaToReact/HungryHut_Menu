@@ -535,6 +535,20 @@ const DEFAULT_THEME_DATA = {
 };
 
 /**
+ * Resolve the backend API base URL.
+ * Priority: window.HUNGRYHUT_API_BASE_URL (set in index.html) → GitHub Pages fallback → relative (localhost).
+ */
+const API_BASE = (function () {
+  if (typeof window === 'undefined') return '';
+  if (window.HUNGRYHUT_API_BASE_URL) return window.HUNGRYHUT_API_BASE_URL.replace(/\/$/, '');
+  const host = window.location.hostname;
+  if (host.includes('github.io') || host.includes('vannilatoreact')) {
+    return 'https://hungryhut-api.vercel.app';
+  }
+  return '';
+})();
+
+/**
  * Menu Service for CRUD & Persistence
  */
 const MenuService = {
@@ -544,6 +558,26 @@ const MenuService = {
     footer: null,
     theme: null,
     admin: null
+  },
+
+
+  // Sync state tracking for change-detection polling
+  _lastSyncTimestamp: null,
+
+  getSyncTimestamp() { return this._lastSyncTimestamp; },
+  setSyncTimestamp(ts) { this._lastSyncTimestamp = ts; },
+
+  async checkForChanges() {
+    try {
+      const since = this._lastSyncTimestamp ? ('?since=' + encodeURIComponent(this._lastSyncTimestamp)) : '';
+      const res = await fetch(`${API_BASE}/api/sync/check${since}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.lastUpdated) this._lastSyncTimestamp = data.lastUpdated;
+        return data;
+      }
+    } catch (e) { /* network issue */ }
+    return { changed: false };
   },
 
   // Auth Helpers (JWT & Session Management)
@@ -588,7 +622,7 @@ const MenuService = {
   // Admin Authentication APIs
   async loginAdmin(email, password) {
     try {
-      const response = await fetch('/api/admin/login', {
+      const response = await fetch(`${API_BASE}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -610,7 +644,7 @@ const MenuService = {
 
   async updateAdminCredentials({ currentPassword, newEmail, newPassword, confirmPassword }) {
     try {
-      const response = await fetch('/api/admin/update-credentials', {
+      const response = await fetch(`${API_BASE}/api/admin/update-credentials`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify({ currentPassword, newEmail, newPassword, confirmPassword })
@@ -629,7 +663,7 @@ const MenuService = {
 
   async getAdminProfile() {
     try {
-      const response = await fetch('/api/admin/me', {
+      const response = await fetch(`${API_BASE}/api/admin/me`, {
         headers: this.getAuthHeaders()
       });
       if (response.ok) {
@@ -683,7 +717,7 @@ const MenuService = {
   // Cloud Database Fetching APIs
   async fetchMenu() {
     try {
-      const response = await fetch('/api/menu');
+      const response = await fetch(`${API_BASE}/api/menu`);
       if (response.ok) {
         const res = await response.json();
         if (res.success && Array.isArray(res.data)) {
@@ -699,7 +733,7 @@ const MenuService = {
 
   async addItem(itemData) {
     try {
-      const response = await fetch('/api/menu', {
+      const response = await fetch(`${API_BASE}/api/menu`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(itemData)
@@ -720,7 +754,7 @@ const MenuService = {
 
   async updateItem(id, itemData) {
     try {
-      const response = await fetch(`/api/menu/${id}`, {
+      const response = await fetch(`${API_BASE}/api/menu/${id}`, {
         method: 'PUT',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(itemData)
@@ -745,7 +779,7 @@ const MenuService = {
       const body = { price: Number(newPrice) };
       if (discountPercent !== null) body.discountPercent = Number(discountPercent);
 
-      const response = await fetch(`/api/menu/${id}/price`, {
+      const response = await fetch(`${API_BASE}/api/menu/${id}/price`, {
         method: 'PATCH',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(body)
@@ -771,7 +805,7 @@ const MenuService = {
 
   async deleteItem(id) {
     try {
-      const response = await fetch(`/api/menu/${id}`, {
+      const response = await fetch(`${API_BASE}/api/menu/${id}`, {
         method: 'DELETE',
         headers: this.getAuthHeaders()
       });
@@ -790,7 +824,7 @@ const MenuService = {
 
   async applyBulkDiscount(percent, scope) {
     try {
-      const response = await fetch('/api/menu/discount', {
+      const response = await fetch(`${API_BASE}/api/menu/discount`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify({ percent, scope })
@@ -809,7 +843,7 @@ const MenuService = {
 
   async resetDefaults() {
     try {
-      const response = await fetch('/api/menu/reset', {
+      const response = await fetch(`${API_BASE}/api/menu/reset`, {
         method: 'POST',
         headers: this.getAuthHeaders()
       });
@@ -847,7 +881,7 @@ const MenuService = {
 
   async fetchFooter() {
     try {
-      const res = await fetch('/api/footer');
+      const res = await fetch(`${API_BASE}/api/footer`);
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.data) {
@@ -864,7 +898,7 @@ const MenuService = {
   async saveFooterData(data) {
     this.setCachedFooter(data);
     try {
-      const res = await fetch('/api/footer', {
+      const res = await fetch(`${API_BASE}/api/footer`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(data)
@@ -903,7 +937,7 @@ const MenuService = {
 
   async fetchTheme() {
     try {
-      const res = await fetch('/api/theme');
+      const res = await fetch(`${API_BASE}/api/theme`);
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.data) {
@@ -920,7 +954,7 @@ const MenuService = {
   async saveThemeData(data) {
     this.setCachedTheme(data);
     try {
-      const res = await fetch('/api/theme', {
+      const res = await fetch(`${API_BASE}/api/theme`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(data)
@@ -938,7 +972,7 @@ const MenuService = {
 
   async resetTheme() {
     try {
-      const res = await fetch('/api/theme/reset', {
+      const res = await fetch(`${API_BASE}/api/theme/reset`, {
         method: 'POST',
         headers: this.getAuthHeaders()
       });

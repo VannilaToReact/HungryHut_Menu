@@ -470,6 +470,44 @@
     window.addEventListener('focus', () => {
       refreshCloudData();
     });
+
+    // 9. 12-second change-detection polling (avoids full downloads when nothing changed)
+    let _pollInterval = null;
+    async function pollForChanges() {
+      try {
+        const result = await MenuService.checkForChanges();
+        if (result && result.changed === true) {
+          await refreshCloudData();
+        }
+      } catch (e) { /* network hiccup – ignore */ }
+    }
+
+    function startPolling() {
+      if (_pollInterval) clearInterval(_pollInterval);
+      _pollInterval = setInterval(pollForChanges, 12000);
+    }
+
+    function stopPolling() {
+      if (_pollInterval) { clearInterval(_pollInterval); _pollInterval = null; }
+    }
+
+    // Pause polling when tab is hidden, resume + check when visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        stopPolling();
+      } else {
+        pollForChanges();
+        startPolling();
+      }
+    });
+
+    // Immediate check + restart polling on network reconnect
+    window.addEventListener('online', () => {
+      pollForChanges();
+      startPolling();
+    });
+
+    startPolling();
   }
 
   // ==========================================================================
