@@ -538,160 +538,419 @@ const DEFAULT_THEME_DATA = {
  * Menu Service for CRUD & Persistence
  */
 const MenuService = {
+  // In-memory cache for instant synchronous rendering
+  _cache: {
+    items: null,
+    footer: null,
+    theme: null,
+    admin: null
+  },
+
+  // Auth Helpers (JWT & Session Management)
+  getAdminToken() {
+    return localStorage.getItem('hungryhut_jwt_token') || sessionStorage.getItem('hungryhut_jwt_token');
+  },
+
+  setAdminToken(token, remember = true) {
+    if (token) {
+      if (remember) {
+        localStorage.setItem('hungryhut_jwt_token', token);
+      }
+      sessionStorage.setItem('hungryhut_jwt_token', token);
+      sessionStorage.setItem(AUTH_KEY, 'true');
+    } else {
+      localStorage.removeItem('hungryhut_jwt_token');
+      sessionStorage.removeItem('hungryhut_jwt_token');
+      sessionStorage.removeItem(AUTH_KEY);
+    }
+  },
+
+  isAdminLoggedIn() {
+    return !!this.getAdminToken();
+  },
+
+  getStoredAdminEmail() {
+    return localStorage.getItem('hungryhut_admin_email') || 'admin@hungryhut.com';
+  },
+
+  setStoredAdminEmail(email) {
+    if (email) localStorage.setItem('hungryhut_admin_email', email);
+  },
+
+  getAuthHeaders() {
+    const token = this.getAdminToken();
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+  },
+
+  // Admin Authentication APIs
+  async loginAdmin(email, password) {
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await response.json();
+      if (data.success && data.token) {
+        this.setAdminToken(data.token);
+        if (data.admin && data.admin.email) {
+          this.setStoredAdminEmail(data.admin.email);
+        }
+        return { success: true, admin: data.admin };
+      }
+      return { success: false, message: data.message || 'Login failed' };
+    } catch (e) {
+      console.error('Login network error', e);
+      return { success: false, message: 'Server unreachable. Please check backend connection.' };
+    }
+  },
+
+  async updateAdminCredentials({ currentPassword, newEmail, newPassword, confirmPassword }) {
+    try {
+      const response = await fetch('/api/admin/update-credentials', {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ currentPassword, newEmail, newPassword, confirmPassword })
+      });
+      const data = await response.json();
+      if (data.success) {
+        if (data.token) this.setAdminToken(data.token);
+        if (data.admin && data.admin.email) this.setStoredAdminEmail(data.admin.email);
+      }
+      return data;
+    } catch (e) {
+      console.error('Update credentials error', e);
+      return { success: false, message: 'Could not connect to server to update credentials.' };
+    }
+  },
+
+  async getAdminProfile() {
+    try {
+      const response = await fetch('/api/admin/me', {
+        headers: this.getAuthHeaders()
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.admin) {
+          this.setStoredAdminEmail(data.admin.email);
+          return data.admin;
+        }
+      }
+    } catch (e) {
+      console.warn('Profile fetch error', e);
+    }
+    return { email: this.getStoredAdminEmail() };
+  },
+
+  logoutAdmin() {
+    this.setAdminToken(null);
+  },
+
+  // Synchronous Getters (From Cache or localStorage fallback)
   getItems() {
+    if (this._cache.items && Array.isArray(this._cache.items) && this._cache.items.length > 0) {
+      return this._cache.items;
+    }
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          this._cache.items = parsed;
           return parsed;
         }
       }
     } catch (e) {
-      console.warn("Storage error, fallback to defaults", e);
+      console.warn('Error reading stored items', e);
     }
     return [...DEFAULT_MENU_DATA];
   },
 
-  saveItems(items) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch (e) {
-      console.error("Storage error saving items", e);
-    }
-  },
-
-  addItem(itemData) {
-    const items = this.getItems();
-    const discount = Number(itemData.discountPercent) || 0;
-    const newItem = {
-      id: "item-" + Date.now(),
-      name: itemData.name.trim(),
-      teluguName: (itemData.teluguName || "").trim(),
-      category: itemData.category.trim(),
-      price: Number(itemData.price) || 0,
-      discountPercent: discount,
-      type: itemData.type || "veg",
-      image: itemData.image || "images/kaju-biryani.jpg",
-      description: (itemData.description || "").trim(),
-      page: itemData.page || (itemData.category.includes('Starters') || itemData.category.includes('Curry') ? 2 : 1)
-    };
-    items.push(newItem);
-    this.saveItems(items);
-    return newItem;
-  },
-
-  updateItem(id, itemData) {
-    const items = this.getItems();
-    const index = items.findIndex(i => i.id === id);
-    if (index !== -1) {
-      items[index] = {
-        ...items[index],
-        name: itemData.name.trim(),
-        teluguName: (itemData.teluguName || "").trim(),
-        category: itemData.category.trim(),
-        price: Number(itemData.price) || 0,
-        discountPercent: Number(itemData.discountPercent) || 0,
-        type: itemData.type || "veg",
-        image: itemData.image || items[index].image,
-        description: (itemData.description || "").trim()
-      };
-      this.saveItems(items);
-      return items[index];
-    }
-    return null;
-  },
-
-  changePrice(id, newPrice, discountPercent = null) {
-    const items = this.getItems();
-    const item = items.find(i => i.id === id);
-    if (item) {
-      item.price = Number(newPrice);
-      if (discountPercent !== null) {
-        item.discountPercent = Number(discountPercent);
+  setCachedItems(items) {
+    if (Array.isArray(items)) {
+      this._cache.items = items;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      } catch (e) {
+        console.warn('Could not cache items locally', e);
       }
-      this.saveItems(items);
-      return item;
     }
-    return null;
   },
 
-  setDiscount(id, discountPercent) {
-    const items = this.getItems();
-    const item = items.find(i => i.id === id);
-    if (item) {
-      item.discountPercent = Math.max(0, Math.min(100, Number(discountPercent)));
-      this.saveItems(items);
-      return item;
+  // Cloud Database Fetching APIs
+  async fetchMenu() {
+    try {
+      const response = await fetch('/api/menu');
+      if (response.ok) {
+        const res = await response.json();
+        if (res.success && Array.isArray(res.data)) {
+          this.setCachedItems(res.data);
+          return res.data;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not fetch menu from MongoDB server, falling back to cache', e);
     }
-    return null;
+    return this.getItems();
   },
 
-  deleteItem(id) {
-    const items = this.getItems();
-    const filtered = items.filter(i => i.id !== id);
-    this.saveItems(filtered);
-    return filtered;
+  async addItem(itemData) {
+    try {
+      const response = await fetch('/api/menu', {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(itemData)
+      });
+      const data = await response.json();
+      if (data.success && data.data) {
+        const current = this.getItems();
+        current.push(data.data);
+        this.setCachedItems(current);
+        return data.data;
+      }
+      throw new Error(data.message || 'Failed to add item');
+    } catch (e) {
+      console.error('Error adding item to MongoDB', e);
+      throw e;
+    }
   },
 
-  resetDefaults() {
-    localStorage.removeItem(STORAGE_KEY);
+  async updateItem(id, itemData) {
+    try {
+      const response = await fetch(`/api/menu/${id}`, {
+        method: 'PUT',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(itemData)
+      });
+      const data = await response.json();
+      if (data.success && data.data) {
+        const current = this.getItems();
+        const idx = current.findIndex(i => i.id === id);
+        if (idx !== -1) current[idx] = data.data;
+        this.setCachedItems(current);
+        return data.data;
+      }
+      throw new Error(data.message || 'Failed to update item');
+    } catch (e) {
+      console.error('Error updating item in MongoDB', e);
+      throw e;
+    }
+  },
+
+  async changePrice(id, newPrice, discountPercent = null) {
+    try {
+      const body = { price: Number(newPrice) };
+      if (discountPercent !== null) body.discountPercent = Number(discountPercent);
+
+      const response = await fetch(`/api/menu/${id}/price`, {
+        method: 'PATCH',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(body)
+      });
+      const data = await response.json();
+      if (data.success && data.data) {
+        const current = this.getItems();
+        const idx = current.findIndex(i => i.id === id);
+        if (idx !== -1) current[idx] = data.data;
+        this.setCachedItems(current);
+        return data.data;
+      }
+      throw new Error(data.message || 'Failed to change price');
+    } catch (e) {
+      console.error('Error updating price in MongoDB', e);
+      throw e;
+    }
+  },
+
+  async setDiscount(id, discountPercent) {
+    return this.changePrice(id, undefined, discountPercent);
+  },
+
+  async deleteItem(id) {
+    try {
+      const response = await fetch(`/api/menu/${id}`, {
+        method: 'DELETE',
+        headers: this.getAuthHeaders()
+      });
+      const data = await response.json();
+      if (data.success) {
+        const current = this.getItems().filter(i => i.id !== id);
+        this.setCachedItems(current);
+        return current;
+      }
+      throw new Error(data.message || 'Failed to delete item');
+    } catch (e) {
+      console.error('Error deleting item from MongoDB', e);
+      throw e;
+    }
+  },
+
+  async applyBulkDiscount(percent, scope) {
+    try {
+      const response = await fetch('/api/menu/discount', {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ percent, scope })
+      });
+      const data = await response.json();
+      if (data.success && Array.isArray(data.data)) {
+        this.setCachedItems(data.data);
+        return data.data;
+      }
+      throw new Error(data.message || 'Failed to apply discount');
+    } catch (e) {
+      console.error('Error applying bulk discount', e);
+      throw e;
+    }
+  },
+
+  async resetDefaults() {
+    try {
+      const response = await fetch('/api/menu/reset', {
+        method: 'POST',
+        headers: this.getAuthHeaders()
+      });
+      const data = await response.json();
+      if (data.success && Array.isArray(data.data)) {
+        this.setCachedItems(data.data);
+        return data.data;
+      }
+    } catch (e) {
+      console.error('Error resetting menu in MongoDB', e);
+    }
     return [...DEFAULT_MENU_DATA];
   },
 
   // Footer Management
   getFooterData() {
+    if (this._cache.footer) return this._cache.footer;
     try {
       const stored = localStorage.getItem(FOOTER_STORAGE_KEY);
-      if (stored) return { ...DEFAULT_FOOTER_DATA, ...JSON.parse(stored) };
-    } catch(e) {
-      console.warn("Could not read footer data from storage", e);
-    }
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        this._cache.footer = { ...DEFAULT_FOOTER_DATA, ...parsed };
+        return this._cache.footer;
+      }
+    } catch(e) {}
     return { ...DEFAULT_FOOTER_DATA };
   },
 
-  saveFooterData(data) {
+  setCachedFooter(data) {
+    this._cache.footer = { ...DEFAULT_FOOTER_DATA, ...data };
     try {
-      localStorage.setItem(FOOTER_STORAGE_KEY, JSON.stringify(data));
-    } catch(e) {
-      console.error("Could not save footer data", e);
+      localStorage.setItem(FOOTER_STORAGE_KEY, JSON.stringify(this._cache.footer));
+    } catch(e) {}
+  },
+
+  async fetchFooter() {
+    try {
+      const res = await fetch('/api/footer');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.data) {
+          this.setCachedFooter(data.data);
+          return this._cache.footer;
+        }
+      }
+    } catch (e) {
+      console.warn('Error fetching footer from MongoDB', e);
     }
+    return this.getFooterData();
+  },
+
+  async saveFooterData(data) {
+    this.setCachedFooter(data);
+    try {
+      const res = await fetch('/api/footer', {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (result.success && result.data) {
+        this.setCachedFooter(result.data);
+        return result.data;
+      }
+    } catch (e) {
+      console.error('Error saving footer to MongoDB', e);
+    }
+    return data;
   },
 
   // Theme Management
   getThemeData() {
+    if (this._cache.theme) return this._cache.theme;
     try {
       const stored = localStorage.getItem(THEME_STORAGE_KEY);
-      if (stored) return { ...DEFAULT_THEME_DATA, ...JSON.parse(stored) };
-    } catch(e) {
-      console.warn("Could not read theme data from storage", e);
-    }
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        this._cache.theme = { ...DEFAULT_THEME_DATA, ...parsed };
+        return this._cache.theme;
+      }
+    } catch(e) {}
     return { ...DEFAULT_THEME_DATA };
   },
 
-  saveThemeData(data) {
+  setCachedTheme(data) {
+    this._cache.theme = { ...DEFAULT_THEME_DATA, ...data };
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(data));
-    } catch(e) {
-      console.error("Could not save theme data", e);
-    }
+      localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(this._cache.theme));
+    } catch(e) {}
   },
 
-  resetTheme() {
-    localStorage.removeItem(THEME_STORAGE_KEY);
+  async fetchTheme() {
+    try {
+      const res = await fetch('/api/theme');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.data) {
+          this.setCachedTheme(data.data);
+          return this._cache.theme;
+        }
+      }
+    } catch (e) {
+      console.warn('Error fetching theme from MongoDB', e);
+    }
+    return this.getThemeData();
+  },
+
+  async saveThemeData(data) {
+    this.setCachedTheme(data);
+    try {
+      const res = await fetch('/api/theme', {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (result.success && result.data) {
+        this.setCachedTheme(result.data);
+        return result.data;
+      }
+    } catch (e) {
+      console.error('Error saving theme to MongoDB', e);
+    }
+    return data;
+  },
+
+  async resetTheme() {
+    try {
+      const res = await fetch('/api/theme/reset', {
+        method: 'POST',
+        headers: this.getAuthHeaders()
+      });
+      const result = await res.json();
+      if (result.success && result.data) {
+        this.setCachedTheme(result.data);
+        return result.data;
+      }
+    } catch (e) {
+      console.error('Error resetting theme in MongoDB', e);
+    }
+    this.setCachedTheme(DEFAULT_THEME_DATA);
     return { ...DEFAULT_THEME_DATA };
-  },
-
-  // Auth Helpers
-  isAdminLoggedIn() {
-    return sessionStorage.getItem(AUTH_KEY) === "true";
-  },
-
-  setAdminLoggedIn(status) {
-    if (status) {
-      sessionStorage.setItem(AUTH_KEY, "true");
-    } else {
-      sessionStorage.removeItem(AUTH_KEY);
-    }
   }
 };

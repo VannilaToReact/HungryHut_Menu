@@ -1,6 +1,7 @@
 /**
- * Hungry Hut Interactive Menu & Admin Controller
- * Supports .env credential authentication, dynamic two-page authentic menu rendering,
+ * Hungry Hut Interactive Menu & Cloud Admin Controller
+ * Connected to MongoDB Atlas with Socket.IO Real-Time Synchronization.
+ * Supports Admin JWT authentication, Password & Email change, dynamic two-page authentic menu rendering,
  * real-time price updates, discount tags, product removal, 60+ color theme customization,
  * live restaurant footer editing, and dedicated in-app admin confirmation dialogs.
  */
@@ -12,15 +13,15 @@
   const state = {
     items: [],
     isAdmin: false,
-    adminCredentials: {
-      email: "admin@hungryhut.com",
-      password: "@admin(hungryhut)"
-    },
     editingId: null,
     selectedImagePreset: "images/kaju-biryani.jpg",
     currentTheme: null,
-    tempTheme: null
+    tempTheme: null,
+    activeCategory: "all"
   };
+
+  // Socket.IO Real-Time Instance
+  let socket = null;
 
   const IMAGE_PRESETS = [
     { label: "Mutton Biryani", path: "images/mutton-biryani.jpg" },
@@ -36,7 +37,6 @@
 
   // 60 Curated Colors for Header & Theme Accent (Replaces Red)
   const SIXTY_COLORS = [
-    // Rich Reds & Maroons (1-10)
     { name: "Hungry Red (Default)", hex: "#800000" },
     { name: "Royal Maroon", hex: "#58111A" },
     { name: "Deep Burgundy", hex: "#6B0F1A" },
@@ -48,7 +48,6 @@
     { name: "Brick Rust", hex: "#9C3D28" },
     { name: "Terracotta", hex: "#B84A39" },
 
-    // Saffron, Ambers & Warm Oranges (11-20)
     { name: "Paprika Red", hex: "#BA2D0B" },
     { name: "Burnt Orange", hex: "#C0392B" },
     { name: "Tandoori Orange", hex: "#C84B16" },
@@ -60,7 +59,6 @@
     { name: "Roasted Cinnamon", hex: "#8C3B18" },
     { name: "Deep Mahogany", hex: "#4E2117" },
 
-    // Royal Greens, Emeralds & Olives (21-30)
     { name: "Emerald Royale", hex: "#0B6623" },
     { name: "Forest Green", hex: "#1E4620" },
     { name: "Dark Jade", hex: "#004B49" },
@@ -72,7 +70,6 @@
     { name: "Velvet Teal", hex: "#005C53" },
     { name: "Malachite", hex: "#126E53" },
 
-    // Regal Blues, Navies & Indigos (31-40)
     { name: "Royal Navy", hex: "#002147" },
     { name: "Midnight Blue", hex: "#191970" },
     { name: "Deep Ocean", hex: "#0A3161" },
@@ -84,7 +81,6 @@
     { name: "Prussian Indigo", hex: "#003153" },
     { name: "Twilight Blue", hex: "#1E2952" },
 
-    // Royal Purples, Violets & Magentas (41-50)
     { name: "Imperial Purple", hex: "#4E085C" },
     { name: "Deep Plum", hex: "#4B0082" },
     { name: "Royal Aubergine", hex: "#3D0C3A" },
@@ -96,7 +92,6 @@
     { name: "Byzantine", hex: "#7D1252" },
     { name: "Rich Orchid", hex: "#682860" },
 
-    // Earth Tones, Choco & Dark Sleek (51-60)
     { name: "Espresso Brown", hex: "#2B1700" },
     { name: "Dark Chocolate", hex: "#3D2314" },
     { name: "Roasted Coffee", hex: "#4A2C1B" },
@@ -133,6 +128,7 @@
   const elements = {
     headerBrand: document.getElementById('headerBrand'),
     adminToolbar: document.getElementById('adminToolbar'),
+    adminLoggedInEmailDisplay: document.getElementById('adminLoggedInEmailDisplay'),
     adminLogoutBtn: document.getElementById('adminLogoutBtn'),
     adminAddDishBtn: document.getElementById('adminAddDishBtn'),
     adminManageBtn: document.getElementById('adminManageBtn'),
@@ -140,6 +136,11 @@
     adminThemeBtn: document.getElementById('adminThemeBtn'),
     adminFooterBtn: document.getElementById('adminFooterBtn'),
     adminResetBtn: document.getElementById('adminResetBtn'),
+    adminAccountBtn: document.getElementById('adminAccountBtn'),
+
+    liveSyncBadge: document.getElementById('liveSyncBadge'),
+    liveSyncText: document.getElementById('liveSyncText'),
+    categoryNavBar: document.getElementById('categoryNavBar'),
 
     page1Container: document.getElementById('page1Container'),
     page2Container: document.getElementById('page2Container'),
@@ -184,16 +185,15 @@
     themeBgGrid: document.getElementById('themeBgGrid'),
     customHeaderPicker: document.getElementById('customHeaderPicker'),
     customBgPicker: document.getElementById('customBgPicker'),
-    themePreviewBox: document.getElementById('themePreviewBox'),
     prevHeader: document.getElementById('prevHeader'),
     prevBody: document.getElementById('prevBody'),
     prevHeading: document.getElementById('prevHeading'),
-    applyThemeBtn: document.getElementById('applyThemeBtn'),
-    resetThemeBtn: document.getElementById('resetThemeBtn'),
     closeThemeModalBtn: document.getElementById('closeThemeModalBtn'),
     cancelThemeModalBtn: document.getElementById('cancelThemeModalBtn'),
+    applyThemeBtn: document.getElementById('applyThemeBtn'),
+    resetThemeBtn: document.getElementById('resetThemeBtn'),
 
-    // Footer Edit Modal
+    // Footer Editor Modal
     footerModal: document.getElementById('footerModal'),
     footerForm: document.getElementById('footerForm'),
     footerTitleInput: document.getElementById('footerTitleInput'),
@@ -212,6 +212,21 @@
     closeManageModalBtn: document.getElementById('closeManageModalBtn'),
     closeManageModalBottomBtn: document.getElementById('closeManageModalBottomBtn'),
 
+    // Admin Credentials / Account Settings Modal
+    credentialsModal: document.getElementById('credentialsModal'),
+    credentialsForm: document.getElementById('credentialsForm'),
+    credCurrentPasswordInput: document.getElementById('credCurrentPasswordInput'),
+    credEmailInput: document.getElementById('credEmailInput'),
+    credNewPasswordInput: document.getElementById('credNewPasswordInput'),
+    credConfirmPasswordInput: document.getElementById('credConfirmPasswordInput'),
+    toggleCredCurrentPassBtn: document.getElementById('toggleCredCurrentPassBtn'),
+    toggleCredNewPassBtn: document.getElementById('toggleCredNewPassBtn'),
+    toggleCredConfirmPassBtn: document.getElementById('toggleCredConfirmPassBtn'),
+    closeCredentialsModalBtn: document.getElementById('closeCredentialsModalBtn'),
+    cancelCredentialsModalBtn: document.getElementById('cancelCredentialsModalBtn'),
+    credsErrorMsg: document.getElementById('credsErrorMsg'),
+    credsSuccessMsg: document.getElementById('credsSuccessMsg'),
+
     // Confirmation Modal
     confirmModal: document.getElementById('confirmModal'),
     confirmTitle: document.getElementById('confirmTitle'),
@@ -227,43 +242,20 @@
     footerDisplayServices: document.getElementById('footerDisplayServices'),
     footerDisplayTimings: document.getElementById('footerDisplayTimings'),
     footerDisplayAddress: document.getElementById('footerDisplayAddress'),
-    footerDisplayPhone: document.getElementById('footerDisplayPhone')
+    footerDisplayPhone: document.getElementById('footerDisplayPhone'),
+
+    // Mobile Bottom Navigation Bar
+    mobileBottomNav: document.getElementById('mobileBottomNav'),
+    navCategoriesBtn: document.getElementById('navCategoriesBtn'),
+    navAdminBtn: document.getElementById('navAdminBtn'),
+    navAdminLabel: document.getElementById('navAdminLabel')
   };
 
   /**
-   * Load Credentials from .env
-   */
-  async function loadEnvCredentials() {
-    try {
-      const response = await fetch('.env');
-      if (response.ok) {
-        const text = await response.text();
-        const lines = text.split('\n');
-        lines.forEach(line => {
-          const trimmed = line.trim();
-          if (trimmed && !trimmed.startsWith('#')) {
-            const eqIndex = trimmed.indexOf('=');
-            if (eqIndex !== -1) {
-              const key = trimmed.slice(0, eqIndex).trim();
-              const val = trimmed.slice(eqIndex + 1).trim();
-              if (key === 'ADMIN_EMAIL') state.adminCredentials.email = val;
-              if (key === 'ADMIN_PASSWORD') state.adminCredentials.password = val;
-            }
-          }
-        });
-      }
-    } catch (e) {
-      console.warn("Could not read .env file directly, using default admin credentials.", e);
-    }
-  }
-
-  /**
    * In-App Luxury Admin Confirmation Dialog
-   * Ensures reliable confirmation across all desktop and automated environments.
    */
   function showAdminConfirm({ title, message, details, icon = '👑', confirmText = 'Confirm & Update', confirmColor = '#16a34a', onConfirm, onCancel }) {
     if (!elements.confirmModal) {
-      // Fallback to native confirm if element not found
       if (confirm(`${title || 'Admin Confirmation'}\n\n${message || ''}`)) {
         if (typeof onConfirm === 'function') onConfirm();
       } else {
@@ -305,29 +297,226 @@
   }
 
   /**
+   * Update Live Multi-Device Cloud Sync Badge
+   */
+  function updateLiveSyncBadge(isConnected) {
+    if (!elements.liveSyncBadge) return;
+    if (isConnected) {
+      elements.liveSyncBadge.classList.add('connected');
+      elements.liveSyncBadge.classList.remove('disconnected');
+      if (elements.liveSyncText) elements.liveSyncText.textContent = 'Live Cloud Sync Active';
+    } else {
+      elements.liveSyncBadge.classList.remove('connected');
+      elements.liveSyncBadge.classList.add('disconnected');
+      if (elements.liveSyncText) elements.liveSyncText.textContent = 'Reconnecting...';
+    }
+  }
+
+  /**
+   * Setup Real-Time Socket.IO Synchronization Across All Devices
+   */
+  function setupRealtimeSocket() {
+    try {
+      if (typeof io !== 'undefined') {
+        socket = io();
+
+        socket.on('connect', () => {
+          updateLiveSyncBadge(true);
+          refreshCloudData();
+        });
+
+        socket.on('disconnect', () => {
+          updateLiveSyncBadge(false);
+        });
+
+        // Remote database broadcasts from other devices or admin
+        socket.on('menu:item_added', (newItem) => {
+          const exists = state.items.some(i => i.id === newItem.id);
+          if (!exists) {
+            state.items.push(newItem);
+            MenuService.setCachedItems(state.items);
+            setupCategoryDropdown();
+            renderMenu();
+            showToast(`✨ New dish added: "${newItem.name}"`, '☁️');
+          }
+        });
+
+        socket.on('menu:item_updated', (updatedItem) => {
+          const idx = state.items.findIndex(i => i.id === updatedItem.id);
+          if (idx !== -1) {
+            state.items[idx] = updatedItem;
+            MenuService.setCachedItems(state.items);
+            renderMenu();
+            showToast(`🔄 Updated dish: "${updatedItem.name}"`, '☁️');
+          }
+        });
+
+        socket.on('menu:item_deleted', ({ id, name }) => {
+          state.items = state.items.filter(i => i.id !== id);
+          MenuService.setCachedItems(state.items);
+          renderMenu();
+          if (elements.manageModal && elements.manageModal.classList.contains('active')) {
+            renderManageProductsList(elements.manageSearchInput.value);
+          }
+          showToast(`🗑️ Dish removed: "${name || id}"`, '☁️');
+        });
+
+        socket.on('menu:batch_updated', (items) => {
+          if (Array.isArray(items)) {
+            state.items = items;
+            MenuService.setCachedItems(items);
+            setupCategoryDropdown();
+            renderMenu();
+            showToast('🔄 Live Menu synchronized with database', '☁️');
+          }
+        });
+
+        socket.on('theme:updated', (theme) => {
+          state.currentTheme = theme;
+          state.tempTheme = { ...theme };
+          MenuService.setCachedTheme(theme);
+          applyTheme(theme);
+          showToast('🎨 Menu theme updated across all devices', '☁️');
+        });
+
+        socket.on('footer:updated', (footer) => {
+          MenuService.setCachedFooter(footer);
+          renderFooter(footer);
+          showToast('📝 Restaurant details updated across all devices', '☁️');
+        });
+      }
+    } catch (e) {
+      console.warn('Socket.IO initialization error:', e);
+    }
+  }
+
+  /**
+   * Refresh Cloud Data on Reconnect or Tab Focus
+   */
+  async function refreshCloudData() {
+    try {
+      const items = await MenuService.fetchMenu();
+      if (Array.isArray(items) && items.length > 0) {
+        state.items = items;
+        renderMenu();
+        setupCategoryDropdown();
+      }
+
+      const theme = await MenuService.fetchTheme();
+      if (theme) {
+        state.currentTheme = theme;
+        applyTheme(theme);
+      }
+
+      const footer = await MenuService.fetchFooter();
+      if (footer) {
+        renderFooter(footer);
+      }
+    } catch (e) {
+      console.warn('Could not refresh cloud data:', e);
+    }
+  }
+
+  /**
    * Initialize Application
    */
   async function init() {
-    await loadEnvCredentials();
+    // 1. Setup Socket.IO real-time sync
+    setupRealtimeSocket();
+
+    // 2. Load menu items from cache and fetch latest from MongoDB
     state.items = MenuService.getItems();
     state.isAdmin = MenuService.isAdminLoggedIn();
 
-    // 1. Apply stored color theme
+    // 3. Apply color theme
     state.currentTheme = MenuService.getThemeData();
     state.tempTheme = { ...state.currentTheme };
     applyTheme(state.currentTheme);
 
-    // 2. Apply stored footer details
+    // 4. Apply footer details
     const footerData = MenuService.getFooterData();
     renderFooter(footerData);
 
-    // 3. Setup UI components
+    // 5. Setup UI components
     setupImagePresets();
     setupCategoryDropdown();
     setupThemePickers();
+    setupCategoryNavBar();
     updateAdminUI();
     bindEvents();
     renderMenu();
+
+    // 6. Asynchronously fetch fresh data from MongoDB
+    refreshCloudData();
+
+    // 7. Verify admin session with server
+    if (state.isAdmin) {
+      try {
+        const prof = await MenuService.getAdminProfile();
+        if (prof && prof.email && elements.adminLoggedInEmailDisplay) {
+          elements.adminLoggedInEmailDisplay.textContent = prof.email;
+        }
+      } catch (e) {
+        console.warn('Admin token check:', e);
+      }
+    }
+
+    // 8. Auto-reconnect / tab focus synchronization
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        refreshCloudData();
+      }
+    });
+    window.addEventListener('focus', () => {
+      refreshCloudData();
+    });
+  }
+
+  // ==========================================================================
+  // MOBILE CATEGORY NAVIGATION BAR
+  // ==========================================================================
+
+  function setupCategoryNavBar() {
+    if (!elements.categoryNavBar) return;
+
+    elements.categoryNavBar.addEventListener('click', (e) => {
+      const pill = e.target.closest('.cat-pill');
+      if (!pill) return;
+
+      elements.categoryNavBar.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+
+      const cat = pill.dataset.cat;
+      state.activeCategory = cat;
+      filterMenuByCategory(cat);
+    });
+  }
+
+  function filterMenuByCategory(category) {
+    const blocks = document.querySelectorAll('.menu-category-block');
+    if (category === 'all') {
+      blocks.forEach(b => {
+        b.style.display = '';
+        b.classList.remove('category-focus');
+      });
+      document.querySelectorAll('.menu-card').forEach(c => c.style.display = '');
+    } else {
+      let targetElement = null;
+      blocks.forEach(b => {
+        if (b.dataset.category === category) {
+          b.style.display = '';
+          b.classList.add('category-focus');
+          targetElement = b;
+        } else {
+          b.style.display = 'none';
+          b.classList.remove('category-focus');
+        }
+      });
+
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   }
 
   // ==========================================================================
@@ -376,7 +565,6 @@
   function setupThemePickers() {
     if (!elements.themeColorGrid || !elements.themeBgGrid) return;
 
-    // Render 60 Header Colors
     elements.themeColorGrid.innerHTML = SIXTY_COLORS.map(c => `
       <div 
         class="color-swatch-item ${state.currentTheme.headerColor.toLowerCase() === c.hex.toLowerCase() ? 'active' : ''}" 
@@ -386,7 +574,6 @@
       ></div>
     `).join('');
 
-    // Render Background Options
     elements.themeBgGrid.innerHTML = BG_COLORS.map(b => `
       <div 
         class="bg-swatch-item ${state.currentTheme.bgColor.toLowerCase() === b.hex.toLowerCase() ? 'active' : ''}" 
@@ -398,7 +585,6 @@
       </div>
     `).join('');
 
-    // Click handler for 60 Header colors
     elements.themeColorGrid.addEventListener('click', (e) => {
       const swatch = e.target.closest('.color-swatch-item');
       if (swatch) {
@@ -410,7 +596,6 @@
       }
     });
 
-    // Custom Header Color Picker change
     elements.customHeaderPicker.addEventListener('input', (e) => {
       const hex = e.target.value;
       elements.themeColorGrid.querySelectorAll('.color-swatch-item').forEach(el => {
@@ -419,7 +604,6 @@
       updateTempHeaderColor(hex);
     });
 
-    // Click handler for Background options
     elements.themeBgGrid.addEventListener('click', (e) => {
       const swatch = e.target.closest('.bg-swatch-item');
       if (swatch) {
@@ -431,7 +615,6 @@
       }
     });
 
-    // Custom Background Color Picker change
     elements.customBgPicker.addEventListener('input', (e) => {
       const hex = e.target.value;
       elements.themeBgGrid.querySelectorAll('.bg-swatch-item').forEach(el => {
@@ -450,13 +633,6 @@
 
   function updateTempBgColor(hex) {
     state.tempTheme.bgColor = hex;
-    if (isColorDark(hex)) {
-      state.tempTheme.cardBg = '#222222';
-      state.tempTheme.textColor = '#F0F0F0';
-    } else {
-      state.tempTheme.cardBg = '#FFFFFF';
-      state.tempTheme.textColor = '#222222';
-    }
     updatePreviewBox();
   }
 
@@ -464,13 +640,6 @@
     if (!elements.prevHeader || !elements.prevBody) return;
     elements.prevHeader.style.background = `linear-gradient(135deg, ${state.tempTheme.headerColor}, ${state.tempTheme.headerGrad})`;
     elements.prevBody.style.background = state.tempTheme.bgColor;
-    elements.prevBody.style.color = state.tempTheme.textColor;
-
-    const card = elements.prevBody.querySelector('div');
-    if (card) {
-      card.style.background = state.tempTheme.cardBg;
-      card.style.color = state.tempTheme.textColor;
-    }
     if (elements.prevHeading) {
       elements.prevHeading.style.color = state.tempTheme.accentColor;
     }
@@ -481,17 +650,12 @@
     elements.customHeaderPicker.value = state.tempTheme.headerColor;
     elements.customBgPicker.value = state.tempTheme.bgColor;
 
-    if (elements.themeColorGrid) {
-      elements.themeColorGrid.querySelectorAll('.color-swatch-item').forEach(el => {
-        el.classList.toggle('active', el.dataset.hex.toLowerCase() === state.tempTheme.headerColor.toLowerCase());
-      });
-    }
-
-    if (elements.themeBgGrid) {
-      elements.themeBgGrid.querySelectorAll('.bg-swatch-item').forEach(el => {
-        el.classList.toggle('active', el.dataset.hex.toLowerCase() === state.tempTheme.bgColor.toLowerCase());
-      });
-    }
+    elements.themeColorGrid.querySelectorAll('.color-swatch-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.hex.toLowerCase() === state.tempTheme.headerColor.toLowerCase());
+    });
+    elements.themeBgGrid.querySelectorAll('.bg-swatch-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.hex.toLowerCase() === state.tempTheme.bgColor.toLowerCase());
+    });
 
     updatePreviewBox();
     elements.themeModal.classList.add('active');
@@ -504,20 +668,20 @@
   function handleApplyTheme() {
     showAdminConfirm({
       icon: '🎨',
-      title: 'Apply Color Theme?',
-      message: 'Confirm applying this new color theme to the live restaurant menu? All header, border, background, and accent tones will update immediately.',
+      title: 'Confirm Menu Color Theme?',
+      message: 'Apply this new color theme to the live restaurant menu? All connected customers and screens will reflect this theme.',
       details: `
-        <div><strong>Primary Theme Color:</strong> <span style="display:inline-block;width:12px;height:12px;background:${state.tempTheme.headerColor};border-radius:2px;vertical-align:middle;margin-right:4px;"></span> ${state.tempTheme.headerColor}</div>
-        <div style="margin-top:4px;"><strong>Background Color:</strong> <span style="display:inline-block;width:12px;height:12px;background:${state.tempTheme.bgColor};border:1px solid #aaa;border-radius:2px;vertical-align:middle;margin-right:4px;"></span> ${state.tempTheme.bgColor}</div>
+        <div><strong>Header & Accent Color:</strong> <span style="display:inline-block; width:12px; height:12px; background:${state.tempTheme.headerColor}; border-radius:2px; vertical-align:middle;"></span> ${state.tempTheme.headerColor}</div>
+        <div style="margin-top:4px;"><strong>Background Color:</strong> <span style="display:inline-block; width:12px; height:12px; background:${state.tempTheme.bgColor}; border:1px solid #ccc; border-radius:2px; vertical-align:middle;"></span> ${state.tempTheme.bgColor}</div>
       `,
       confirmText: 'Confirm & Apply Theme',
-      confirmColor: '#16a34a',
-      onConfirm: () => {
+      confirmColor: '#2563eb',
+      onConfirm: async () => {
         state.currentTheme = { ...state.tempTheme };
-        MenuService.saveThemeData(state.currentTheme);
         applyTheme(state.currentTheme);
+        await MenuService.saveThemeData(state.currentTheme);
         closeThemeModal();
-        showToast('🎨 Color theme successfully updated and applied!', '✅');
+        showToast('🎨 Menu theme updated across all devices!', '✨');
       }
     });
   }
@@ -525,42 +689,42 @@
   function handleResetTheme() {
     showAdminConfirm({
       icon: '🔄',
-      title: 'Reset Theme to Default?',
-      message: 'Reset color theme back to default Hungry Hut authentic red and warm cream?',
-      confirmText: 'Reset to Default Red',
+      title: 'Reset Theme to Default Red?',
+      message: 'Are you sure you want to restore the original Hungry Hut authentic red theme?',
+      confirmText: 'Yes, Reset Theme',
       confirmColor: '#dc2626',
-      onConfirm: () => {
-        state.currentTheme = MenuService.resetTheme();
+      onConfirm: async () => {
+        state.currentTheme = await MenuService.resetTheme();
         state.tempTheme = { ...state.currentTheme };
         applyTheme(state.currentTheme);
         closeThemeModal();
-        showToast('Color theme reset to default Hungry Hut authentic red!', '🔄');
+        showToast('Restored default Hungry Hut theme!', '🔄');
       }
     });
   }
 
   // ==========================================================================
-  // FOOTER EDITING FUNCTIONS
+  // FOOTER FUNCTIONS
   // ==========================================================================
 
-  function renderFooter(footerData) {
-    if (!footerData) return;
-    if (elements.footerDisplayTitle) elements.footerDisplayTitle.textContent = footerData.restaurantTitle || "🍽️ Hungry Hut Restaurant & Cafe";
-    if (elements.footerDisplayTagline) elements.footerDisplayTagline.textContent = footerData.tagline || "";
-    if (elements.footerDisplayServices) elements.footerDisplayServices.textContent = footerData.services || "";
-    if (elements.footerDisplayTimings) elements.footerDisplayTimings.textContent = footerData.timings || "";
-    if (elements.footerDisplayAddress) elements.footerDisplayAddress.textContent = footerData.address || "";
-    if (elements.footerDisplayPhone) elements.footerDisplayPhone.textContent = footerData.phoneNumbers || "";
+  function renderFooter(data) {
+    if (!data) return;
+    if (elements.footerDisplayTitle) elements.footerDisplayTitle.textContent = `🍽️ ${data.restaurantTitle || 'Hungry Hut Restaurant & Cafe'}`;
+    if (elements.footerDisplayTagline) elements.footerDisplayTagline.textContent = data.tagline || 'Authentic Dum Biryanis, Starters, Wok Rice & Curries';
+    if (elements.footerDisplayServices) elements.footerDisplayServices.textContent = data.services || 'Dine-In • Takeaway • Bulk Party Orders';
+    if (elements.footerDisplayTimings) elements.footerDisplayTimings.textContent = data.timings || 'Open Daily: 11:00 AM - 11:00 PM';
+    if (elements.footerDisplayAddress) elements.footerDisplayAddress.textContent = data.address || 'Near K. R. R. School, Kurnool to Nandyal Road, PANYAM, 518112';
+    if (elements.footerDisplayPhone) elements.footerDisplayPhone.textContent = data.phoneNumbers || '85559 38190, 63044 54153';
   }
 
   function openFooterModal() {
-    const footerData = MenuService.getFooterData();
-    if (elements.footerTitleInput) elements.footerTitleInput.value = footerData.restaurantTitle || "";
-    if (elements.footerTaglineInput) elements.footerTaglineInput.value = footerData.tagline || "";
-    if (elements.footerPhoneInput) elements.footerPhoneInput.value = footerData.phoneNumbers || "";
-    if (elements.footerTimingsInput) elements.footerTimingsInput.value = footerData.timings || "";
-    if (elements.footerAddressInput) elements.footerAddressInput.value = footerData.address || "";
-    if (elements.footerServicesInput) elements.footerServicesInput.value = footerData.services || "";
+    const data = MenuService.getFooterData();
+    elements.footerTitleInput.value = data.restaurantTitle || '';
+    elements.footerTaglineInput.value = data.tagline || '';
+    elements.footerPhoneInput.value = data.phoneNumbers || '';
+    elements.footerTimingsInput.value = data.timings || '';
+    elements.footerAddressInput.value = data.address || '';
+    elements.footerServicesInput.value = data.services || '';
     elements.footerModal.classList.add('active');
   }
 
@@ -578,18 +742,22 @@
     const address = elements.footerAddressInput.value.trim();
     const services = elements.footerServicesInput.value.trim();
 
+    if (!title || !phone || !address) {
+      alert('Please fill out Title, Phone Numbers, and Address.');
+      return;
+    }
+
     showAdminConfirm({
       icon: '📝',
-      title: 'Update Restaurant Footer?',
-      message: 'Confirm updating restaurant footer details on the live menu?',
+      title: 'Confirm Footer Details Update?',
+      message: 'Confirm updating restaurant brand info, operating timings, and phone numbers in MongoDB?',
       details: `
-        <div><strong>Brand Title:</strong> ${escapeHtml(title)}</div>
-        <div style="margin-top:4px;"><strong>Contact Numbers:</strong> ${escapeHtml(phone)}</div>
-        <div style="margin-top:4px;"><strong>Address:</strong> ${escapeHtml(address)}</div>
+        <div><strong>Title:</strong> ${escapeHtml(title)}</div>
+        <div style="margin-top:4px;"><strong>Contact:</strong> ${escapeHtml(phone)}</div>
       `,
       confirmText: 'Confirm & Save Footer',
       confirmColor: '#16a34a',
-      onConfirm: () => {
+      onConfirm: async () => {
         const updated = {
           restaurantTitle: title,
           tagline,
@@ -599,7 +767,7 @@
           services
         };
 
-        MenuService.saveFooterData(updated);
+        await MenuService.saveFooterData(updated);
         renderFooter(updated);
         closeFooterModal();
         showToast('📝 Restaurant footer details updated successfully!', '✅');
@@ -655,15 +823,14 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 6px;">
-          <button class="btn-row-action btn-manage-edit" data-id="${item.id}" title="Edit Dish Details">✏️</button>
-          <button class="btn-remove-dish" data-id="${item.id}" title="Remove Product from Menu">
+          <button type="button" class="btn-row-action btn-manage-edit" data-id="${item.id}" title="Edit Dish Details">✏️</button>
+          <button type="button" class="btn-remove-dish" data-id="${item.id}" title="Remove Product from Menu">
             🗑️ Remove
           </button>
         </div>
       </div>
     `).join('');
 
-    // Bind remove button clicks in the manage modal
     elements.manageProductsList.querySelectorAll('.btn-remove-dish').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -681,19 +848,17 @@
           `,
           confirmText: 'Yes, Remove Product',
           confirmColor: '#dc2626',
-          onConfirm: () => {
-            MenuService.deleteItem(id);
-            state.items = MenuService.getItems();
-            setupCategoryDropdown();
-            renderMenu();
+          onConfirm: async () => {
+            await MenuService.deleteItem(id);
+            state.items = state.items.filter(i => i.id !== id);
             renderManageProductsList(elements.manageSearchInput.value);
-            showToast(`🗑️ Removed "${item.name}" from the menu.`, '✅');
+            renderMenu();
+            showToast(`Dish "${item.name}" removed from menu.`, '🗑️');
           }
         });
       });
     });
 
-    // Bind edit button clicks in the manage modal
     elements.manageProductsList.querySelectorAll('.btn-manage-edit').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -705,157 +870,116 @@
   }
 
   // ==========================================================================
-  // DISH IMAGES & CATEGORIES
+  // ADMIN CREDENTIALS & ACCOUNT SETTINGS (PASSWORD & EMAIL CHANGE)
   // ==========================================================================
 
-  function setupImagePresets() {
-    if (!elements.imagePresetGrid) return;
-    elements.imagePresetGrid.innerHTML = IMAGE_PRESETS.map((p, idx) => `
-      <div class="image-picker-thumb ${idx === 0 ? 'selected' : ''}" data-path="${p.path}" title="${p.label}">
-        <img src="${p.path}" alt="${p.label}" loading="lazy">
-      </div>
-    `).join('');
+  function openCredentialsModal() {
+    if (!elements.credentialsModal) return;
+    elements.credentialsForm.reset();
+    elements.credsErrorMsg.style.display = 'none';
+    elements.credsSuccessMsg.style.display = 'none';
 
-    elements.imagePresetGrid.addEventListener('click', (e) => {
-      const thumb = e.target.closest('.image-picker-thumb');
-      if (thumb) {
-        elements.imagePresetGrid.querySelectorAll('.image-picker-thumb').forEach(el => el.classList.remove('selected'));
-        thumb.classList.add('selected');
-        state.selectedImagePreset = thumb.dataset.path;
-      }
-    });
+    const currentEmail = MenuService.getStoredAdminEmail();
+    if (elements.credEmailInput) {
+      elements.credEmailInput.value = currentEmail;
+    }
+
+    elements.credentialsModal.classList.add('active');
+    if (elements.credCurrentPasswordInput) {
+      elements.credCurrentPasswordInput.focus();
+    }
   }
 
-  function setupCategoryDropdown() {
-    if (!elements.dishCategorySelect) return;
-    const categories = Array.from(new Set(state.items.map(i => i.category)));
-    elements.dishCategorySelect.innerHTML = categories.map(cat => `
-      <option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>
-    `).join('') + `<option value="__NEW__">+ Add New Category...</option>`;
+  function closeCredentialsModal() {
+    if (elements.credentialsModal) {
+      elements.credentialsModal.classList.remove('active');
+    }
   }
 
-  // ==========================================================================
-  // EVENT BINDINGS
-  // ==========================================================================
+  async function handleSaveCredentials(e) {
+    e.preventDefault();
+    elements.credsErrorMsg.style.display = 'none';
+    elements.credsSuccessMsg.style.display = 'none';
 
-  function bindEvents() {
-    // Header Logo Click -> Opens Admin Login or highlights Admin Bar
-    elements.headerBrand.addEventListener('click', () => {
-      if (!state.isAdmin) {
-        openLoginModal();
-      } else {
-        showToast('👑 Admin Mode is currently active! Use the toolbar above to make changes.', 'ℹ️');
-        elements.adminToolbar.scrollIntoView({ behavior: 'smooth' });
+    const currentPassword = elements.credCurrentPasswordInput.value;
+    const newEmail = elements.credEmailInput.value.trim();
+    const newPassword = elements.credNewPasswordInput.value;
+    const confirmPassword = elements.credConfirmPasswordInput.value;
+
+    if (!currentPassword) {
+      elements.credsErrorMsg.textContent = 'Please enter your current password to verify your identity.';
+      elements.credsErrorMsg.style.display = 'block';
+      return;
+    }
+
+    if (newPassword) {
+      if (newPassword.length < 6) {
+        elements.credsErrorMsg.textContent = 'New password must be at least 6 characters long.';
+        elements.credsErrorMsg.style.display = 'block';
+        return;
       }
-    });
+      if (newPassword !== confirmPassword) {
+        elements.credsErrorMsg.textContent = 'New password and confirmation password do not match.';
+        elements.credsErrorMsg.style.display = 'block';
+        return;
+      }
+    }
 
-    // Admin Login Form
-    elements.loginForm.addEventListener('submit', handleLoginSubmit);
-    elements.closeLoginModalBtn.addEventListener('click', closeLoginModal);
-    elements.loginModal.addEventListener('click', (e) => {
-      if (e.target === elements.loginModal) closeLoginModal();
-    });
+    const currentEmail = MenuService.getStoredAdminEmail();
+    const emailChanging = newEmail && newEmail.toLowerCase() !== currentEmail.toLowerCase();
+    const passChanging = !!newPassword;
 
-    // Password Visibility Toggle (Eye Symbol)
-    if (elements.togglePasswordBtn && elements.loginPasswordInput) {
-      elements.togglePasswordBtn.addEventListener('click', () => {
-        const isPassword = elements.loginPasswordInput.type === 'password';
-        elements.loginPasswordInput.type = isPassword ? 'text' : 'password';
-        
-        const eyeOpen = elements.togglePasswordBtn.querySelector('.eye-open');
-        const eyeClosed = elements.togglePasswordBtn.querySelector('.eye-closed');
-        if (eyeOpen && eyeClosed) {
-          eyeOpen.style.display = isPassword ? 'none' : 'block';
-          eyeClosed.style.display = isPassword ? 'block' : 'none';
+    if (!emailChanging && !passChanging) {
+      elements.credsErrorMsg.textContent = 'No changes detected. Enter a new email address or new password.';
+      elements.credsErrorMsg.style.display = 'block';
+      return;
+    }
+
+    let changeDesc = [];
+    if (emailChanging) changeDesc.push(`Admin Email to "${escapeHtml(newEmail)}"`);
+    if (passChanging) changeDesc.push('Admin Password');
+
+    showAdminConfirm({
+      icon: '🔑',
+      title: 'Confirm Security Changes?',
+      message: `Confirm updating your ${changeDesc.join(' and ')} in MongoDB?`,
+      confirmText: 'Confirm & Save Changes',
+      confirmColor: '#7c3aed',
+      onConfirm: async () => {
+        try {
+          const res = await MenuService.updateAdminCredentials({
+            currentPassword,
+            newEmail,
+            newPassword,
+            confirmPassword
+          });
+
+          if (res.success) {
+            elements.credsSuccessMsg.textContent = res.message || 'Credentials updated successfully!';
+            elements.credsSuccessMsg.style.display = 'block';
+
+            if (elements.adminLoggedInEmailDisplay && newEmail) {
+              elements.adminLoggedInEmailDisplay.textContent = newEmail;
+            }
+
+            elements.credCurrentPasswordInput.value = '';
+            elements.credNewPasswordInput.value = '';
+            elements.credConfirmPasswordInput.value = '';
+
+            showToast('🔑 Admin credentials saved securely in MongoDB!', '✅');
+            setTimeout(() => {
+              closeCredentialsModal();
+            }, 1800);
+          } else {
+            elements.credsErrorMsg.textContent = res.message || 'Verification failed. Please check current password.';
+            elements.credsErrorMsg.style.display = 'block';
+          }
+        } catch (err) {
+          elements.credsErrorMsg.textContent = 'Network or server error while updating credentials.';
+          elements.credsErrorMsg.style.display = 'block';
         }
-        elements.togglePasswordBtn.title = isPassword ? 'Enclose/Hide Password' : 'Show Password';
-      });
-    }
-
-    // Admin Logout
-    elements.adminLogoutBtn.addEventListener('click', handleLogout);
-
-    // Add Dish Button in Admin Bar
-    elements.adminAddDishBtn.addEventListener('click', () => {
-      openDishModal(null);
-    });
-
-    // Manage / Remove Dishes Button in Admin Bar
-    elements.adminManageBtn.addEventListener('click', openManageModal);
-    elements.closeManageModalBtn.addEventListener('click', closeManageModal);
-    elements.closeManageModalBottomBtn.addEventListener('click', closeManageModal);
-    elements.manageModal.addEventListener('click', (e) => {
-      if (e.target === elements.manageModal) closeManageModal();
-    });
-    elements.manageSearchInput.addEventListener('input', (e) => {
-      renderManageProductsList(e.target.value);
-    });
-
-    // Theme Customizer Button in Admin Bar
-    elements.adminThemeBtn.addEventListener('click', openThemeModal);
-    elements.closeThemeModalBtn.addEventListener('click', closeThemeModal);
-    elements.cancelThemeModalBtn.addEventListener('click', closeThemeModal);
-    elements.themeModal.addEventListener('click', (e) => {
-      if (e.target === elements.themeModal) closeThemeModal();
-    });
-    elements.applyThemeBtn.addEventListener('click', handleApplyTheme);
-    elements.resetThemeBtn.addEventListener('click', handleResetTheme);
-
-    // Edit Footer Button in Admin Bar
-    elements.adminFooterBtn.addEventListener('click', openFooterModal);
-    elements.closeFooterModalBtn.addEventListener('click', closeFooterModal);
-    elements.cancelFooterModalBtn.addEventListener('click', closeFooterModal);
-    elements.footerModal.addEventListener('click', (e) => {
-      if (e.target === elements.footerModal) closeFooterModal();
-    });
-    elements.footerForm.addEventListener('submit', handleSaveFooter);
-
-    // Category select change in Dish Modal
-    elements.dishCategorySelect.addEventListener('change', (e) => {
-      if (e.target.value === '__NEW__') {
-        elements.dishNewCategoryInput.style.display = 'block';
-        elements.dishNewCategoryInput.required = true;
-        elements.dishNewCategoryInput.focus();
-      } else {
-        elements.dishNewCategoryInput.style.display = 'none';
-        elements.dishNewCategoryInput.required = false;
       }
     });
-
-    // Add/Edit Dish Modal close
-    elements.closeDishModalBtn.addEventListener('click', closeDishModal);
-    elements.cancelDishModalBtn.addEventListener('click', closeDishModal);
-    elements.dishModal.addEventListener('click', (e) => {
-      if (e.target === elements.dishModal) closeDishModal();
-    });
-
-    // Save Dish Form Submit
-    elements.dishForm.addEventListener('submit', handleSaveDish);
-
-    // Bulk Discount Modal
-    elements.adminDiscountBtn.addEventListener('click', openDiscountModal);
-    elements.closeDiscountModalBtn.addEventListener('click', closeDiscountModal);
-    elements.cancelDiscountModalBtn.addEventListener('click', closeDiscountModal);
-    elements.discountModal.addEventListener('click', (e) => {
-      if (e.target === elements.discountModal) closeDiscountModal();
-    });
-    elements.discountForm.addEventListener('submit', handleApplyBulkDiscount);
-
-    // Reset Defaults
-    elements.adminResetBtn.addEventListener('click', handleResetDefaults);
-  }
-
-  /**
-   * Update Admin UI states
-   */
-  function updateAdminUI() {
-    if (state.isAdmin) {
-      document.body.classList.add('admin-active');
-      elements.adminToolbar.classList.add('active');
-    } else {
-      document.body.classList.remove('admin-active');
-      elements.adminToolbar.classList.remove('active');
-    }
   }
 
   // ==========================================================================
@@ -863,7 +987,6 @@
   // ==========================================================================
 
   function renderMenu() {
-    // Page 1 categories
     const page1Categories = [
       {
         name: "Veg Biryani",
@@ -886,7 +1009,6 @@
       }
     ];
 
-    // Page 2 categories
     const page2Categories = [
       {
         name: "Veg Starters",
@@ -914,7 +1036,6 @@
       }
     ];
 
-    // Check for any newly added custom categories
     const allCategories = Array.from(new Set(state.items.map(i => i.category)));
     const defaultCatNames = [
       "Veg Biryani", "Fried Rice Items", "Non - Veg Biryani",
@@ -942,8 +1063,12 @@
     });
     elements.page2Container.innerHTML = p2Html;
 
-    // Bind action listeners for quick edit, discount, and delete on dishes
     bindItemRowActions();
+
+    // Re-apply active category filter if set
+    if (state.activeCategory && state.activeCategory !== 'all') {
+      filterMenuByCategory(state.activeCategory);
+    }
   }
 
   function renderCategorySection(categoryName, sideImages, isReverse = false) {
@@ -1012,16 +1137,16 @@
 
           <!-- Admin Quick Action Controls -->
           <div class="item-admin-actions">
-            <button class="btn-row-action btn-item-price" data-id="${item.id}" title="Quick Change Price">
+            <button type="button" class="btn-row-action btn-item-price" data-id="${item.id}" title="Quick Change Price">
               ₹
             </button>
-            <button class="btn-row-action btn-item-discount" data-id="${item.id}" title="Add/Change Discount">
+            <button type="button" class="btn-row-action btn-item-discount" data-id="${item.id}" title="Add/Change Discount">
               🏷️
             </button>
-            <button class="btn-row-action btn-item-edit" data-id="${item.id}" title="Edit Dish Details">
+            <button type="button" class="btn-row-action btn-item-edit" data-id="${item.id}" title="Edit Dish Details">
               ✏️
             </button>
-            <button class="btn-row-action btn-item-delete" data-id="${item.id}" title="Remove Product">
+            <button type="button" class="btn-row-action btn-item-delete" data-id="${item.id}" title="Remove Product">
               🗑️
             </button>
           </div>
@@ -1048,11 +1173,11 @@
             details: `<div><strong>Previous Price:</strong> ₹${item.price}/-</div><div style="margin-top:4px;"><strong>New Price:</strong> ₹${newPrice}/-</div>`,
             confirmText: 'Confirm Price',
             confirmColor: '#16a34a',
-            onConfirm: () => {
-              MenuService.changePrice(id, Number(newPrice));
-              state.items = MenuService.getItems();
+            onConfirm: async () => {
+              await MenuService.changePrice(id, newPrice);
+              item.price = Number(newPrice);
               renderMenu();
-              showToast(`Price for "${item.name}" updated to ₹${newPrice}/-`, '✅');
+              showToast(`Updated price for "${item.name}" to ₹${newPrice}/-`, '💰');
             }
           });
         }
@@ -1067,26 +1192,26 @@
         const item = state.items.find(i => i.id === id);
         if (!item) return;
 
-        const discount = prompt(`Enter discount % for "${item.name}" (0 to 100, Current: ${item.discountPercent || 0}%):`, item.discountPercent || 0);
-        if (discount !== null && !isNaN(Number(discount))) {
+        const newDisc = prompt(`Enter discount % for "${item.name}" (0 to 100, current: ${item.discountPercent || 0}%):`, item.discountPercent || 0);
+        if (newDisc !== null && !isNaN(Number(newDisc)) && Number(newDisc) >= 0 && Number(newDisc) <= 100) {
           showAdminConfirm({
             icon: '🏷️',
-            title: 'Confirm Dish Discount?',
-            message: `Apply ${discount}% discount to <strong>${escapeHtml(item.name)}</strong> on the live menu?`,
+            title: 'Confirm Discount Update?',
+            message: `Update discount on <strong>${escapeHtml(item.name)}</strong> to <strong>${newDisc}%</strong>?`,
             confirmText: 'Apply Discount',
             confirmColor: '#16a34a',
-            onConfirm: () => {
-              MenuService.setDiscount(id, Number(discount));
-              state.items = MenuService.getItems();
+            onConfirm: async () => {
+              await MenuService.setDiscount(id, newDisc);
+              item.discountPercent = Number(newDisc);
               renderMenu();
-              showToast(`Discount for "${item.name}" set to ${discount}%!`, '🏷️');
+              showToast(`Updated discount for "${item.name}" to ${newDisc}%`, '🏷️');
             }
           });
         }
       });
     });
 
-    // Edit Item
+    // Quick Edit Dish Details
     document.querySelectorAll('.btn-item-edit').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1095,7 +1220,7 @@
       });
     });
 
-    // Delete Item directly from menu row
+    // Quick Delete Dish
     document.querySelectorAll('.btn-item-delete').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1105,20 +1230,16 @@
 
         showAdminConfirm({
           icon: '🗑️',
-          title: 'Remove Product from Menu?',
-          message: `Are you sure you want to permanently remove <strong>"${escapeHtml(item.name)}"</strong> from the menu?`,
-          details: `
-            <div><strong>Category:</strong> ${escapeHtml(item.category)}</div>
-            <div style="margin-top:4px;"><strong>Price:</strong> ₹${item.price}/-</div>
-          `,
-          confirmText: 'Yes, Remove Product',
+          title: 'Remove Dish from Live Menu?',
+          message: `Are you sure you want to permanently delete <strong>"${escapeHtml(item.name)}"</strong> from the menu?`,
+          details: `<div><strong>Category:</strong> ${escapeHtml(item.category)}</div><div style="margin-top:4px;"><strong>Price:</strong> ₹${item.price}/-</div>`,
+          confirmText: 'Yes, Delete Dish',
           confirmColor: '#dc2626',
-          onConfirm: () => {
-            MenuService.deleteItem(id);
-            state.items = MenuService.getItems();
-            setupCategoryDropdown();
+          onConfirm: async () => {
+            await MenuService.deleteItem(id);
+            state.items = state.items.filter(i => i.id !== id);
             renderMenu();
-            showToast(`🗑️ Removed "${item.name}" from the menu.`, '✅');
+            showToast(`Dish "${item.name}" deleted from menu.`, '🗑️');
           }
         });
       });
@@ -1126,60 +1247,39 @@
   }
 
   // ==========================================================================
-  // ADMIN AUTHENTICATION
-  // ==========================================================================
-
-  function openLoginModal() {
-    elements.loginEmailInput.value = state.adminCredentials.email || 'admin@hungryhut.com';
-    elements.loginPasswordInput.value = '';
-    elements.loginPasswordInput.type = 'password';
-    if (elements.togglePasswordBtn) {
-      const eyeOpen = elements.togglePasswordBtn.querySelector('.eye-open');
-      const eyeClosed = elements.togglePasswordBtn.querySelector('.eye-closed');
-      if (eyeOpen && eyeClosed) {
-        eyeOpen.style.display = 'block';
-        eyeClosed.style.display = 'none';
-      }
-      elements.togglePasswordBtn.title = 'Show Password';
-    }
-    elements.loginErrorMsg.style.display = 'none';
-    elements.loginModal.classList.add('active');
-    elements.loginPasswordInput.focus();
-  }
-
-  function closeLoginModal() {
-    elements.loginModal.classList.remove('active');
-  }
-
-  function handleLoginSubmit(e) {
-    e.preventDefault();
-    const email = elements.loginEmailInput.value.trim();
-    const password = elements.loginPasswordInput.value;
-
-    if (email === state.adminCredentials.email && password === state.adminCredentials.password) {
-      state.isAdmin = true;
-      MenuService.setAdminLoggedIn(true);
-      closeLoginModal();
-      updateAdminUI();
-      renderMenu();
-      showToast('🎉 Admin login successful! Welcome back.', '👑');
-    } else {
-      elements.loginErrorMsg.textContent = 'Invalid email or password. Please verify credentials.';
-      elements.loginErrorMsg.style.display = 'block';
-    }
-  }
-
-  function handleLogout() {
-    state.isAdmin = false;
-    MenuService.setAdminLoggedIn(false);
-    updateAdminUI();
-    renderMenu();
-    showToast('Logged out of Admin Portal.', '👋');
-  }
-
-  // ==========================================================================
   // DISH CRUD MODAL
   // ==========================================================================
+
+  function setupImagePresets() {
+    if (!elements.imagePresetGrid) return;
+    elements.imagePresetGrid.innerHTML = IMAGE_PRESETS.map(preset => `
+      <div 
+        class="image-picker-thumb ${preset.path === state.selectedImagePreset ? 'selected' : ''}" 
+        data-path="${preset.path}" 
+        title="${preset.label}"
+      >
+        <img src="${preset.path}" alt="${preset.label}">
+        <span class="image-picker-label">${preset.label}</span>
+      </div>
+    `).join('');
+
+    elements.imagePresetGrid.addEventListener('click', (e) => {
+      const thumb = e.target.closest('.image-picker-thumb');
+      if (thumb) {
+        elements.imagePresetGrid.querySelectorAll('.image-picker-thumb').forEach(el => el.classList.remove('selected'));
+        thumb.classList.add('selected');
+        state.selectedImagePreset = thumb.dataset.path;
+      }
+    });
+  }
+
+  function setupCategoryDropdown() {
+    if (!elements.dishCategorySelect) return;
+    const categories = Array.from(new Set(state.items.map(i => i.category)));
+    elements.dishCategorySelect.innerHTML = categories.map(cat => `
+      <option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>
+    `).join('') + `<option value="__NEW__">+ Add New Category...</option>`;
+  }
 
   function openDishModal(dishId) {
     state.editingId = dishId;
@@ -1263,7 +1363,7 @@
       `,
       confirmText: 'Confirm & Save Dish',
       confirmColor: '#16a34a',
-      onConfirm: () => {
+      onConfirm: async () => {
         const payload = {
           name,
           teluguName,
@@ -1276,10 +1376,10 @@
         };
 
         if (state.editingId) {
-          MenuService.updateItem(state.editingId, payload);
+          await MenuService.updateItem(state.editingId, payload);
           showToast(`Updated "${name}" successfully!`, '✅');
         } else {
-          MenuService.addItem(payload);
+          await MenuService.addItem(payload);
           showToast(`Added new dish "${name}" to the menu!`, '🎉');
         }
 
@@ -1320,20 +1420,9 @@
       message: `Confirm applying ${discount}% discount to <strong>${scope.toUpperCase()}</strong> items on the live menu?`,
       confirmText: 'Confirm & Apply Discount',
       confirmColor: '#16a34a',
-      onConfirm: () => {
-        state.items.forEach(item => {
-          if (scope === 'all') {
-            item.discountPercent = discount;
-          } else if (scope === 'veg' && item.type === 'veg') {
-            item.discountPercent = discount;
-          } else if (scope === 'non-veg' && item.type === 'non-veg') {
-            item.discountPercent = discount;
-          } else if (scope === 'biryani' && item.category.toLowerCase().includes('biryani')) {
-            item.discountPercent = discount;
-          }
-        });
-
-        MenuService.saveItems(state.items);
+      onConfirm: async () => {
+        const updatedItems = await MenuService.applyBulkDiscount(discount, scope);
+        state.items = updatedItems;
         closeDiscountModal();
         renderMenu();
         showToast(`Applied ${discount}% discount to selected dishes!`, '🏷️');
@@ -1352,12 +1441,218 @@
       message: 'Are you sure you want to restore original Hungry Hut dishes? All price modifications, added dishes, and custom discounts will revert to default.',
       confirmText: 'Yes, Reset Menu',
       confirmColor: '#dc2626',
-      onConfirm: () => {
-        state.items = MenuService.resetDefaults();
+      onConfirm: async () => {
+        state.items = await MenuService.resetDefaults();
         setupCategoryDropdown();
         renderMenu();
-        showToast('Menu restored to original dishes!', '🔄');
+        showToast('Menu restored to original dishes in MongoDB!', '🔄');
       }
+    });
+  }
+
+  // ==========================================================================
+  // ADMIN AUTHENTICATION
+  // ==========================================================================
+
+  function openLoginModal() {
+    elements.loginForm.reset();
+    elements.loginErrorMsg.style.display = 'none';
+    elements.loginEmailInput.value = MenuService.getStoredAdminEmail();
+    elements.loginModal.classList.add('active');
+    elements.loginPasswordInput.focus();
+  }
+
+  function closeLoginModal() {
+    elements.loginModal.classList.remove('active');
+  }
+
+  async function handleLoginSubmit(e) {
+    e.preventDefault();
+    const email = elements.loginEmailInput.value.trim();
+    const password = elements.loginPasswordInput.value;
+
+    elements.loginErrorMsg.style.display = 'none';
+
+    const result = await MenuService.loginAdmin(email, password);
+    if (result.success) {
+      state.isAdmin = true;
+      if (elements.adminLoggedInEmailDisplay && result.admin && result.admin.email) {
+        elements.adminLoggedInEmailDisplay.textContent = result.admin.email;
+      }
+      closeLoginModal();
+      updateAdminUI();
+      renderMenu();
+      showToast('🎉 Admin login successful! Welcome back.', '👑');
+    } else {
+      elements.loginErrorMsg.textContent = result.message || 'Invalid email or password.';
+      elements.loginErrorMsg.style.display = 'block';
+    }
+  }
+
+  function handleLogout() {
+    state.isAdmin = false;
+    MenuService.logoutAdmin();
+    updateAdminUI();
+    renderMenu();
+    showToast('Logged out of Admin Portal.', '👋');
+  }
+
+  function updateAdminUI() {
+    document.body.classList.toggle('admin-mode', state.isAdmin);
+    if (elements.adminToolbar) {
+      elements.adminToolbar.classList.toggle('active', state.isAdmin);
+    }
+    if (elements.navAdminLabel) {
+      elements.navAdminLabel.textContent = state.isAdmin ? 'Admin (Active)' : 'Admin';
+    }
+    const email = MenuService.getStoredAdminEmail();
+    if (elements.adminLoggedInEmailDisplay) {
+      elements.adminLoggedInEmailDisplay.textContent = email;
+    }
+  }
+
+  // ==========================================================================
+  // EVENT BINDINGS
+  // ==========================================================================
+
+  function bindEvents() {
+    // Header Brand Click -> Admin Portal or highlight toolbar
+    elements.headerBrand.addEventListener('click', () => {
+      if (!state.isAdmin) {
+        openLoginModal();
+      } else {
+        showToast('👑 Admin Mode is active! Manage products, theme, and account using the toolbar.', 'ℹ️');
+        elements.adminToolbar.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+
+    // Login Form Submit & Modal Controls
+    elements.loginForm.addEventListener('submit', handleLoginSubmit);
+    elements.closeLoginModalBtn.addEventListener('click', closeLoginModal);
+    elements.loginModal.addEventListener('click', (e) => {
+      if (e.target === elements.loginModal) closeLoginModal();
+    });
+
+    // Password Visibility Toggle for Login
+    if (elements.togglePasswordBtn && elements.loginPasswordInput) {
+      elements.togglePasswordBtn.addEventListener('click', () => {
+        const isPassword = elements.loginPasswordInput.type === 'password';
+        elements.loginPasswordInput.type = isPassword ? 'text' : 'password';
+        elements.togglePasswordBtn.title = isPassword ? 'Hide Password' : 'Show Password';
+      });
+    }
+
+    // Admin Logout
+    elements.adminLogoutBtn.addEventListener('click', handleLogout);
+
+    // Toolbar Buttons
+    elements.adminAddDishBtn.addEventListener('click', () => openDishModal(null));
+    elements.adminDiscountBtn.addEventListener('click', openDiscountModal);
+    elements.adminThemeBtn.addEventListener('click', openThemeModal);
+    elements.adminFooterBtn.addEventListener('click', openFooterModal);
+    elements.adminManageBtn.addEventListener('click', openManageModal);
+    elements.adminResetBtn.addEventListener('click', handleResetDefaults);
+
+    // Admin Account & Credentials Settings Modal
+    if (elements.adminAccountBtn) {
+      elements.adminAccountBtn.addEventListener('click', openCredentialsModal);
+    }
+    if (elements.closeCredentialsModalBtn) {
+      elements.closeCredentialsModalBtn.addEventListener('click', closeCredentialsModal);
+    }
+    if (elements.cancelCredentialsModalBtn) {
+      elements.cancelCredentialsModalBtn.addEventListener('click', closeCredentialsModal);
+    }
+    if (elements.credentialsModal) {
+      elements.credentialsModal.addEventListener('click', (e) => {
+        if (e.target === elements.credentialsModal) closeCredentialsModal();
+      });
+    }
+    if (elements.credentialsForm) {
+      elements.credentialsForm.addEventListener('submit', handleSaveCredentials);
+    }
+
+    // Toggle Eye buttons for credentials modal
+    setupPasswordToggle(elements.toggleCredCurrentPassBtn, elements.credCurrentPasswordInput);
+    setupPasswordToggle(elements.toggleCredNewPassBtn, elements.credNewPasswordInput);
+    setupPasswordToggle(elements.toggleCredConfirmPassBtn, elements.credConfirmPasswordInput);
+
+    // Add/Edit Dish Modal Controls
+    elements.dishForm.addEventListener('submit', handleSaveDish);
+    elements.closeDishModalBtn.addEventListener('click', closeDishModal);
+    elements.cancelDishModalBtn.addEventListener('click', closeDishModal);
+    elements.dishModal.addEventListener('click', (e) => {
+      if (e.target === elements.dishModal) closeDishModal();
+    });
+
+    elements.dishCategorySelect.addEventListener('change', (e) => {
+      elements.dishNewCategoryInput.style.display = e.target.value === '__NEW__' ? 'block' : 'none';
+      if (e.target.value === '__NEW__') elements.dishNewCategoryInput.focus();
+    });
+
+    // Bulk Discount Modal Controls
+    elements.discountForm.addEventListener('submit', handleApplyBulkDiscount);
+    elements.closeDiscountModalBtn.addEventListener('click', closeDiscountModal);
+    elements.cancelDiscountModalBtn.addEventListener('click', closeDiscountModal);
+    elements.discountModal.addEventListener('click', (e) => {
+      if (e.target === elements.discountModal) closeDiscountModal();
+    });
+
+    // Theme Customizer Modal Controls
+    elements.closeThemeModalBtn.addEventListener('click', closeThemeModal);
+    elements.cancelThemeModalBtn.addEventListener('click', closeThemeModal);
+    elements.applyThemeBtn.addEventListener('click', handleApplyTheme);
+    elements.resetThemeBtn.addEventListener('click', handleResetTheme);
+    elements.themeModal.addEventListener('click', (e) => {
+      if (e.target === elements.themeModal) closeThemeModal();
+    });
+
+    // Footer Editor Modal Controls
+    elements.footerForm.addEventListener('submit', handleSaveFooter);
+    elements.closeFooterModalBtn.addEventListener('click', closeFooterModal);
+    elements.cancelFooterModalBtn.addEventListener('click', closeFooterModal);
+    elements.footerModal.addEventListener('click', (e) => {
+      if (e.target === elements.footerModal) closeFooterModal();
+    });
+
+    // Manage Products Modal Controls
+    elements.closeManageModalBtn.addEventListener('click', closeManageModal);
+    elements.closeManageModalBottomBtn.addEventListener('click', closeManageModal);
+    elements.manageModal.addEventListener('click', (e) => {
+      if (e.target === elements.manageModal) closeManageModal();
+    });
+    elements.manageSearchInput.addEventListener('input', (e) => {
+      renderManageProductsList(e.target.value);
+    });
+
+    // Mobile Bottom Navigation Bar Controls
+    if (elements.navCategoriesBtn) {
+      elements.navCategoriesBtn.addEventListener('click', () => {
+        if (elements.categoryNavBar) {
+          elements.categoryNavBar.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 120, behavior: 'smooth' });
+        }
+      });
+    }
+
+    if (elements.navAdminBtn) {
+      elements.navAdminBtn.addEventListener('click', () => {
+        if (!state.isAdmin) {
+          openLoginModal();
+        } else {
+          openCredentialsModal();
+        }
+      });
+    }
+  }
+
+  function setupPasswordToggle(btn, input) {
+    if (!btn || !input) return;
+    btn.addEventListener('click', () => {
+      const isPass = input.type === 'password';
+      input.type = isPass ? 'text' : 'password';
+      btn.title = isPass ? 'Hide Password' : 'Show Password';
     });
   }
 
@@ -1392,7 +1687,7 @@
       .replace(/'/g, '&#39;');
   }
 
-  // Initialize on load
+  // Initialize on DOM load
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

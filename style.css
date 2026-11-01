@@ -1029,3 +1029,427 @@ footer {
   border-color: #dc2626;
 }
 
+
+/* ==========================================================================
+   MULTI-DEVICE REAL-TIME CLOUD SYNC BADGE
+   ========================================================================== */
+.live-sync-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  margin-top: 6px;
+  transition: all 0.25s ease;
+}
+
+.sync-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+  animation: pulseSync 2s infinite ease-in-out;
+}
+
+.live-sync-badge.disconnected .sync-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+  animation: pulseSync 1s infinite ease-in-out;
+}
+
+@keyframes pulseSync {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* ==========================================================================
+   MOBILE CATEGORY NAVIGATION BAR (STICKY HORIZONTAL PILLS)
+   ========================================================================== */
+.category-nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 248, 240, 0.94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 10px 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: background 0.3s ease;
+}
+
+.category-nav-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.category-nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-pill {
+  background: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 7px 16px;
+  border-radius: 24px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  user-select: none;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.cat-pill:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
+  transform: translateY(-1px);
+}
+
+.cat-pill.active {
+  background: var(--theme-accent-color, #800000);
+  color: #fff;
+  border-color: var(--theme-accent-color, #800000);
+  box-shadow: 0 3px 8px rgba(128, 0, 0, 0.3);
+}
+
+/* Focused category animation when clicking a pill */
+.menu-category-block.category-focus {
+  animation: categoryHighlight 1.5s ease;
+}
+
+@keyframes categoryHighlight {
+  0% { transform: scale(0.99); }
+  50% { transform: scale(1.01); }
+  100% { transform: scale(1); }
+}
+
+/* ==========================================================================
+   MOBILE FLOATING BOTTOM NAVIGATION BAR (NATIVE APP FEEL)
+   ========================================================================== */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #ffffff;
+  border-top: 1px solid #e5e5e5;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #444;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  gap: 3px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.mobile-nav-item:active {
+  background: rgba(0, 0, 0, 0.05);
+  transform: scale(0.94);
+}
+
+.mobile-nav-item .nav-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.mobile-nav-item:hover, .mobile-nav-item.active {
+  color: var(--theme-accent-color, #800000);
+}
+
+/* ==========================================================================
+   MOBILE-FIRST OPTIMIZATION & APPLICATION LOOK (SCREENS <= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 80px; /* Space for mobile bottom nav */
+    overflow-x: hidden;
+  }
+
+  /* Compact Native Mobile App Bar Header */
+  header {
+    padding: 10px 14px;
+    border-bottom-width: 3px;
+  }
+
+  .header-container {
+    gap: 12px;
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .logo {
+    width: 48px;
+    height: 48px;
+    padding: 4px;
+    border-width: 2px;
+  }
+
+  .brand h1 {
+    font-size: 24px;
+    line-height: 1.1;
+  }
+
+  .brand h3 {
+    font-size: 11.5px;
+    letter-spacing: 2px;
+    margin: 2px 0;
+  }
+
+  .menu-tag {
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    display: inline-block;
+  }
+
+  /* Welcome Banner */
+  .welcome-banner {
+    padding: 10px 14px;
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .welcome-banner h2 {
+    font-size: 16.5px;
+    margin: 0;
+  }
+
+  .live-sync-badge {
+    margin-top: 2px;
+    font-size: 11px;
+    padding: 3px 10px;
+  }
+
+  /* Compact Admin Toolbar for Mobile */
+  .admin-toolbar {
+    flex-direction: column;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .admin-status {
+    font-size: 12px;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .admin-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .btn-admin {
+    padding: 8px 10px;
+    font-size: 12px;
+    justify-content: center;
+    text-align: center;
+    min-height: 40px;
+  }
+
+  /* Mobile App Menu Cards - Reduced Spacing & Touch Ergonomics */
+  .menu-container {
+    padding: 8px;
+    gap: 16px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menu-card {
+    min-width: 100%;
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-torn-border-top, .card-torn-border-bottom {
+    height: 10px;
+    background-size: 14px 10px;
+  }
+
+  .card-inner-content {
+    padding: 12px 10px;
+  }
+
+  .category-heading {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .category-brush-underline {
+    height: 3px;
+    margin-bottom: 12px;
+  }
+
+  .category-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .category-row.reverse {
+    flex-direction: column;
+  }
+
+  .category-images-col {
+    display: none; /* Hide heavy side images on mobile to keep compact app look */
+  }
+
+  .menu-item-row {
+    padding: 10px 8px;
+    font-size: 14px;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+  }
+
+  .item-name-part {
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .item-english {
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+
+  .item-telugu {
+    font-size: 13px;
+  }
+
+  .item-price-part {
+    font-size: 14.5px;
+    font-weight: 700;
+    gap: 4px;
+  }
+
+  .price-discounted {
+    font-size: 15px;
+  }
+
+  .discount-tag {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .btn-row-action {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  /* Show Mobile Bottom Navigation */
+  .mobile-bottom-nav {
+    display: flex;
+  }
+
+  /* Modals on Mobile: Native Mobile Sheet Feel */
+  .modal-window {
+    max-width: 95vw !important;
+    max-height: 88vh;
+    border-radius: 14px;
+    padding: 16px;
+    margin: auto 8px;
+  }
+
+  .modal-title-bar h3 {
+    font-size: 16px;
+  }
+
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .modal-btn-row {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .modal-btn-row button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Footer on Mobile */
+  footer {
+    padding: 24px 14px;
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .footer-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .footer-box h4 {
+    font-size: 20px;
+  }
+
+  .phone {
+    font-size: 20px;
+  }
+}
+
+/* Extra small screens (<= 400px) */
+@media (max-width: 400px) {
+  .brand h1 {
+    font-size: 21px;
+  }
+
+  .item-english {
+    font-size: 13.5px;
+  }
+
+  .item-telugu {
+    font-size: 12px;
+  }
+
+  .item-price-part {
+    font-size: 13.5px;
+  }
+
+  .admin-actions {
+    grid-template-columns: 1fr;
+  }
+}

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Hungry Hut - Authentic Menu</title>
   
   <!-- Favicon -->
@@ -18,11 +18,7 @@
 <body>
 
   <!-- ==========================================================================
-       TOP RESTAURANT HEADER
-       Clicking the logo opens the Admin Portal
-       ========================================================================== -->
-  <!-- ==========================================================================
-       TOP RESTAURANT NAVBAR (EXACT ORIGINAL NAVBAR)
+       TOP RESTAURANT HEADER (EXACT AUTHENTIC HUNGRY HUT BRAND)
        Clicking anywhere on the brand/logo opens the Admin Portal
        ========================================================================== -->
   <header>
@@ -38,9 +34,26 @@
     </div>
   </header>
 
-  <!-- Welcome Subheading Banner -->
+  <!-- Welcome Subheading Banner + Multi-Device Real-Time Cloud Sync Indicator -->
   <div class="welcome-banner">
     <h2>🍽️ Welcome to Hungry Hut Menu</h2>
+    <div class="live-sync-badge" id="liveSyncBadge" title="Real-time multi-device cloud synchronization active">
+      <span class="sync-dot"></span>
+      <span class="sync-text" id="liveSyncText">Live Cloud Sync</span>
+    </div>
+  </div>
+
+  <!-- Mobile Category Quick Filter Bar (Native Mobile App Experience) -->
+  <div class="category-nav-bar" id="categoryNavBar">
+    <div class="category-nav-scroll">
+      <button type="button" class="cat-pill active" data-cat="all">🍽️ All Dishes</button>
+      <button type="button" class="cat-pill" data-cat="Veg Biryani">🥘 Veg Biryani</button>
+      <button type="button" class="cat-pill" data-cat="Non - Veg Biryani">🍗 Non-Veg Biryani</button>
+      <button type="button" class="cat-pill" data-cat="Fried Rice Items">🍚 Fried Rice</button>
+      <button type="button" class="cat-pill" data-cat="Veg Starters">🥗 Veg Starters</button>
+      <button type="button" class="cat-pill" data-cat="Veg Curry Items">🍛 Veg Curries</button>
+      <button type="button" class="cat-pill" data-cat="Non-Veg Starters">🍗 Non-Veg Starters</button>
+    </div>
   </div>
 
   <!-- ==========================================================================
@@ -49,16 +62,17 @@
   <div class="admin-toolbar" id="adminToolbar">
     <div class="admin-status">
       <span class="admin-badge">ADMIN</span>
-      <span>Logged in as <strong>admin@hungryhut.com</strong></span>
+      <span>Logged in as <strong id="adminLoggedInEmailDisplay">admin@hungryhut.com</strong></span>
     </div>
     <div class="admin-actions">
-      <button class="btn-admin btn-admin-add" id="adminAddDishBtn">✨ + Add Product</button>
-      <button class="btn-admin btn-admin-discount" id="adminDiscountBtn">🏷️ Discounts</button>
-      <button class="btn-admin btn-admin-theme" id="adminThemeBtn" style="background: #2563eb; color: #fff;">🎨 Color Theme (60+)</button>
-      <button class="btn-admin btn-admin-footer" id="adminFooterBtn" style="background: #059669; color: #fff;">📝 Edit Footer</button>
-      <button class="btn-admin btn-admin-manage" id="adminManageBtn" style="background: #d97706; color: #fff;">📋 Remove / Manage Dishes</button>
-      <button class="btn-admin btn-admin-logout" id="adminResetBtn" title="Reset all changes back to original 40 dishes">🔄 Reset Defaults</button>
-      <button class="btn-admin btn-admin-logout" id="adminLogoutBtn">🚪 Logout</button>
+      <button type="button" class="btn-admin btn-admin-add" id="adminAddDishBtn">✨ + Add Product</button>
+      <button type="button" class="btn-admin btn-admin-discount" id="adminDiscountBtn">🏷️ Discounts</button>
+      <button type="button" class="btn-admin btn-admin-theme" id="adminThemeBtn" style="background: #2563eb; color: #fff;">🎨 Color Theme (60+)</button>
+      <button type="button" class="btn-admin btn-admin-footer" id="adminFooterBtn" style="background: #059669; color: #fff;">📝 Edit Footer</button>
+      <button type="button" class="btn-admin btn-admin-manage" id="adminManageBtn" style="background: #d97706; color: #fff;">📋 Remove / Manage Dishes</button>
+      <button type="button" class="btn-admin btn-admin-creds" id="adminAccountBtn" style="background: #7c3aed; color: #fff;">🔑 Admin Account</button>
+      <button type="button" class="btn-admin btn-admin-logout" id="adminResetBtn" title="Reset all changes back to original 40 dishes">🔄 Reset Defaults</button>
+      <button type="button" class="btn-admin btn-admin-logout" id="adminLogoutBtn">🚪 Logout</button>
     </div>
   </div>
 
@@ -89,14 +103,12 @@
 
   <!-- ==========================================================================
        MODAL 1: ADMIN LOGIN
-       Credentials read dynamically from .env:
-       admin@hungryhut.com / @admin(hungryhut)
        ========================================================================== -->
   <div class="modal-backdrop" id="loginModal" role="dialog" aria-modal="true">
     <div class="modal-window" style="max-width: 420px;">
       <div class="modal-title-bar">
         <h3>🔒 Hungry Hut Admin Portal</h3>
-        <button class="modal-close-icon" id="closeLoginModalBtn">✕</button>
+        <button type="button" class="modal-close-icon" id="closeLoginModalBtn">✕</button>
       </div>
 
       <form id="loginForm">
@@ -111,22 +123,15 @@
 
           <div class="form-field">
             <label for="loginEmailInput">Admin Email</label>
-            <input type="email" id="loginEmailInput" placeholder="admin@hungryhut.com" required>
+            <input type="email" id="loginEmailInput" placeholder="admin@hungryhut.com" required autocomplete="username">
           </div>
 
           <div class="form-field">
             <label for="loginPasswordInput">Password</label>
             <div class="password-wrapper">
-              <input type="password" id="loginPasswordInput" placeholder="••••••••••••" required>
+              <input type="password" id="loginPasswordInput" placeholder="••••••••••••" required autocomplete="current-password">
               <button type="button" class="toggle-password-btn" id="togglePasswordBtn" title="Show/Hide Password" aria-label="Toggle password visibility">
-                <svg viewBox="0 0 24 24" class="eye-icon eye-open" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-                <svg viewBox="0 0 24 24" class="eye-icon eye-closed" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                  <line x1="1" y1="1" x2="23" y2="23"></line>
-                </svg>
+                👁️
               </button>
             </div>
           </div>
@@ -147,7 +152,7 @@
     <div class="modal-window">
       <div class="modal-title-bar">
         <h3 id="dishModalTitle">✨ Add New Product</h3>
-        <button class="modal-close-icon" id="closeDishModalBtn">✕</button>
+        <button type="button" class="modal-close-icon" id="closeDishModalBtn">✕</button>
       </div>
 
       <form id="dishForm">
@@ -236,7 +241,7 @@
     <div class="modal-window" style="max-width: 440px;">
       <div class="modal-title-bar">
         <h3>🏷️ Configure Menu Discounts</h3>
-        <button class="modal-close-icon" id="closeDiscountModalBtn">✕</button>
+        <button type="button" class="modal-close-icon" id="closeDiscountModalBtn">✕</button>
       </div>
 
       <form id="discountForm">
@@ -272,7 +277,7 @@
     <div class="modal-window">
       <div class="modal-title-bar">
         <h3>📝 Edit Restaurant Footer Information</h3>
-        <button class="modal-close-icon" id="closeFooterModalBtn">✕</button>
+        <button type="button" class="modal-close-icon" id="closeFooterModalBtn">✕</button>
       </div>
 
       <form id="footerForm">
@@ -324,7 +329,7 @@
     <div class="modal-window" style="max-width: 680px;">
       <div class="modal-title-bar">
         <h3>🎨 Customize Menu Color Theme</h3>
-        <button class="modal-close-icon" id="closeThemeModalBtn">✕</button>
+        <button type="button" class="modal-close-icon" id="closeThemeModalBtn">✕</button>
       </div>
 
       <div class="modal-content-body" style="max-height: 70vh; overflow-y: auto;">
@@ -402,7 +407,7 @@
     <div class="modal-window" style="max-width: 620px;">
       <div class="modal-title-bar">
         <h3>📋 Manage & Remove Menu Products</h3>
-        <button class="modal-close-icon" id="closeManageModalBtn">✕</button>
+        <button type="button" class="modal-close-icon" id="closeManageModalBtn">✕</button>
       </div>
 
       <div class="modal-content-body">
@@ -445,6 +450,71 @@
   </div>
 
   <!-- ==========================================================================
+       MODAL 8: ADMIN ACCOUNT & SECURITY SETTINGS
+       Allows admin to change password and/or change email with current password verification
+       ========================================================================== -->
+  <div class="modal-backdrop" id="credentialsModal" role="dialog" aria-modal="true">
+    <div class="modal-window" style="max-width: 440px;">
+      <div class="modal-title-bar">
+        <h3>🔑 Admin Account Settings</h3>
+        <button type="button" class="modal-close-icon" id="closeCredentialsModalBtn">✕</button>
+      </div>
+
+      <form id="credentialsForm">
+        <div class="modal-content-body">
+          <p style="font-size: 13.5px; color: #555; margin-bottom: 14px;">
+            Update your administrative credentials. Entering your <strong>current password</strong> is required for verification.
+          </p>
+
+          <div id="credsErrorMsg" style="display: none; background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 14px;"></div>
+          <div id="credsSuccessMsg" style="display: none; background: #dcfce7; border: 1px solid #86efac; color: #15803d; padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 14px;"></div>
+
+          <div class="form-field">
+            <label for="credCurrentPasswordInput">Current Password * (Required for verification)</label>
+            <div class="password-wrapper">
+              <input type="password" id="credCurrentPasswordInput" placeholder="Enter current password" required autocomplete="current-password">
+              <button type="button" class="toggle-password-btn" id="toggleCredCurrentPassBtn" title="Show/Hide Password" aria-label="Toggle password visibility">
+                👁️
+              </button>
+            </div>
+          </div>
+
+          <div class="form-field" style="margin-top: 12px;">
+            <label for="credEmailInput">Admin Email Address</label>
+            <input type="email" id="credEmailInput" placeholder="admin@hungryhut.com" required autocomplete="email">
+            <span style="font-size: 11.5px; color: #666; margin-top: 3px; display: block;">You can update your admin contact email here.</span>
+          </div>
+
+          <div class="form-field" style="margin-top: 12px;">
+            <label for="credNewPasswordInput">New Password (Leave blank to keep unchanged)</label>
+            <div class="password-wrapper">
+              <input type="password" id="credNewPasswordInput" placeholder="•••••••••••• (min 6 characters)" autocomplete="new-password">
+              <button type="button" class="toggle-password-btn" id="toggleCredNewPassBtn" title="Show/Hide Password" aria-label="Toggle password visibility">
+                👁️
+              </button>
+            </div>
+          </div>
+
+          <div class="form-field" style="margin-top: 12px;">
+            <label for="credConfirmPasswordInput">Confirm New Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="credConfirmPasswordInput" placeholder="Repeat new password" autocomplete="new-password">
+              <button type="button" class="toggle-password-btn" id="toggleCredConfirmPassBtn" title="Show/Hide Password" aria-label="Toggle password visibility">
+                👁️
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-btn-row">
+          <button type="button" class="btn-cancel-action" id="cancelCredentialsModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="saveCredentialsBtn" style="background: #7c3aed;">Save Account Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
        AUTHENTIC RESTAURANT FOOTER (INCLUDES RESTAURANT INFO BOX)
        ========================================================================== -->
   <footer id="restaurantFooter">
@@ -467,7 +537,28 @@
     </div>
   </footer>
 
+  <!-- Mobile Floating Quick-Action Bar (Native App Feel) -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <a href="tel:8555938190" class="mobile-nav-item" id="navCallBtn">
+      <span class="nav-icon">📞</span>
+      <span class="nav-label">Call Us</span>
+    </a>
+    <button type="button" class="mobile-nav-item" id="navCategoriesBtn">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">Categories</span>
+    </button>
+    <a href="#restaurantFooter" class="mobile-nav-item" id="navLocationBtn">
+      <span class="nav-icon">📍</span>
+      <span class="nav-label">Visit Us</span>
+    </a>
+    <button type="button" class="mobile-nav-item" id="navAdminBtn">
+      <span class="nav-icon">👑</span>
+      <span class="nav-label" id="navAdminLabel">Admin</span>
+    </button>
+  </nav>
+
   <!-- Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
   <script src="menuData.js"></script>
   <script src="app.js"></script>
 </body>
