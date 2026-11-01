@@ -1194,81 +1194,124 @@ footer {
   color: var(--theme-accent-color, #800000);
 }
 
+
 /* ==========================================================================
-   MOBILE-FIRST OPTIMIZATION & APPLICATION LOOK (SCREENS <= 768px)
+   MOBILE-FIRST OPTIMIZATION & AUTHENTIC APPLICATION LOOK (SCREENS <= 768px)
+   Header arranged, footer polished, culinary dish images restored,
+   and clean margins between mobile screen edges and menu cards.
    ========================================================================== */
 @media (max-width: 768px) {
   body {
-    padding-bottom: 80px; /* Space for mobile bottom nav */
+    padding-bottom: 85px; /* Clean breathing room for mobile bottom nav */
     overflow-x: hidden;
   }
 
-  /* Compact Native Mobile App Bar Header */
+  /* --------------------------------------------------------------------------
+     1. HEADER ARRANGEMENT (BALANCED & CENTERED RESTAURANT BRANDING)
+     -------------------------------------------------------------------------- */
   header {
-    padding: 10px 14px;
-    border-bottom-width: 3px;
+    padding: 14px 12px 16px 12px;
+    border-bottom: 3.5px solid var(--theme-header-border, gold);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    text-align: center;
   }
 
   .header-container {
-    gap: 12px;
-    flex-direction: row;
-    justify-content: flex-start;
-    text-align: left;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 8px !important;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .logo {
-    width: 48px;
-    height: 48px;
-    padding: 4px;
-    border-width: 2px;
+    width: 64px !important;
+    height: 64px !important;
+    padding: 5px !important;
+    border-width: 2.5px !important;
+    border-radius: 50% !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25) !important;
+    margin-bottom: 2px;
   }
 
   .brand h1 {
-    font-size: 24px;
-    line-height: 1.1;
+    font-size: 32px !important;
+    font-weight: bold !important;
+    line-height: 1.15 !important;
+    margin: 0 !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.35) !important;
   }
 
   .brand h3 {
-    font-size: 11.5px;
-    letter-spacing: 2px;
-    margin: 2px 0;
+    font-size: 13px !important;
+    letter-spacing: 3.5px !important;
+    color: #FFD700 !important;
+    margin: 4px 0 6px 0 !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
   }
 
   .menu-tag {
-    font-size: 9px;
-    letter-spacing: 1px;
-    padding: 2px 8px;
-    display: inline-block;
+    font-size: 9.5px !important;
+    letter-spacing: 0.8px !important;
+    padding: 4px 14px !important;
+    border-radius: 20px !important;
+    display: inline-block !important;
+    font-weight: bold !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
   }
 
-  /* Welcome Banner */
+  /* --------------------------------------------------------------------------
+     WELCOME SUBHEADING BANNER & REAL-TIME CLOUD SYNC BADGE
+     -------------------------------------------------------------------------- */
   .welcome-banner {
-    padding: 10px 14px;
+    padding: 12px 14px;
+    margin: 12px auto 6px auto;
+    display: flex;
     flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 6px;
     text-align: center;
   }
 
   .welcome-banner h2 {
-    font-size: 16.5px;
+    font-size: 18.5px !important;
     margin: 0;
   }
 
   .live-sync-badge {
     margin-top: 2px;
-    font-size: 11px;
-    padding: 3px 10px;
+    font-size: 11.5px;
+    padding: 4px 12px;
   }
 
-  /* Compact Admin Toolbar for Mobile */
+  /* --------------------------------------------------------------------------
+     CATEGORY STICKY NAV PILLS
+     -------------------------------------------------------------------------- */
+  .category-nav-bar {
+    padding: 8px 12px;
+  }
+
+  .cat-pill {
+    font-size: 12.5px;
+    padding: 6px 14px;
+    min-height: 36px;
+  }
+
+  /* --------------------------------------------------------------------------
+     ADMIN TOOLBAR ON MOBILE
+     -------------------------------------------------------------------------- */
   .admin-toolbar {
     flex-direction: column;
-    padding: 10px 12px;
+    padding: 12px 14px;
     gap: 10px;
   }
 
   .admin-status {
-    font-size: 12px;
+    font-size: 12.5px;
     width: 100%;
     justify-content: space-between;
   }
@@ -1288,19 +1331,29 @@ footer {
     min-height: 40px;
   }
 
-  /* Mobile App Menu Cards - Reduced Spacing & Touch Ergonomics */
+  /* --------------------------------------------------------------------------
+     2. MAINTAIN GAP BETWEEN MOBILE EDGE AND MENU CARD
+     -------------------------------------------------------------------------- */
   .menu-container {
-    padding: 8px;
-    gap: 16px;
-    flex-direction: column;
-    align-items: stretch;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 24px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 14px 16px !important; /* Clean 16px margin from mobile screen edges */
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
   }
 
   .menu-card {
-    min-width: 100%;
-    max-width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    width: 100% !important;
+    max-width: 580px !important;
+    margin: 0 auto 16px auto !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1) !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
   .card-torn-border-top, .card-torn-border-bottom {
@@ -1309,11 +1362,11 @@ footer {
   }
 
   .card-inner-content {
-    padding: 12px 10px;
+    padding: 14px 12px !important;
   }
 
   .category-heading {
-    font-size: 18px;
+    font-size: 18.5px !important;
     margin-bottom: 4px;
   }
 
@@ -1322,23 +1375,68 @@ footer {
     margin-bottom: 12px;
   }
 
+  /* --------------------------------------------------------------------------
+     3. RESTORE CULINARY DISH IMAGES IN MOBILE VIEW
+     -------------------------------------------------------------------------- */
   .category-row {
-    flex-direction: column;
-    gap: 12px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
   }
 
   .category-row.reverse {
-    flex-direction: column;
+    flex-direction: column !important;
   }
 
+  .category-items-col {
+    width: 100% !important;
+  }
+
+  /* Distinct culinary photo strip for mobile */
   .category-images-col {
-    display: none; /* Hide heavy side images on mobile to keep compact app look */
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    width: 100% !important;
+    margin: 10px 0 14px 0 !important;
+    padding: 6px 4px !important;
   }
 
+  .menu-side-image-card {
+    display: block !important;
+    width: 86px !important;
+    height: 76px !important;
+    min-width: 86px !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18) !important;
+    border: 2px solid #FFD700 !important;
+    background: #fff !important;
+    flex-shrink: 0 !important;
+  }
+
+  .menu-side-image-card img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+
+  .menu-side-image-card.round {
+    border-radius: 50% !important;
+    width: 78px !important;
+    height: 78px !important;
+    min-width: 78px !important;
+  }
+
+  /* Dish Rows in Mobile View */
   .menu-item-row {
-    padding: 10px 8px;
-    font-size: 14px;
-    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+    padding: 10px 6px !important;
+    font-size: 14px !important;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.08) !important;
   }
 
   .item-name-part {
@@ -1348,27 +1446,27 @@ footer {
   }
 
   .item-english {
-    font-size: 14.5px;
+    font-size: 14.5px !important;
     font-weight: 600;
   }
 
   .item-telugu {
-    font-size: 13px;
+    font-size: 13px !important;
   }
 
   .item-price-part {
-    font-size: 14.5px;
+    font-size: 14.5px !important;
     font-weight: 700;
     gap: 4px;
   }
 
   .price-discounted {
-    font-size: 15px;
+    font-size: 15px !important;
   }
 
   .discount-tag {
-    font-size: 10px;
-    padding: 2px 6px;
+    font-size: 10px !important;
+    padding: 2px 6px !important;
   }
 
   .btn-row-action {
@@ -1377,79 +1475,120 @@ footer {
     font-size: 13px;
   }
 
+  /* --------------------------------------------------------------------------
+     4. FOOTER ARRANGEMENT ON MOBILE (WELL-SPACED, NO OVERLAPPING)
+     -------------------------------------------------------------------------- */
+  footer {
+    margin-top: 35px !important;
+    padding: 28px 16px 95px 16px !important; /* 95px bottom padding ensures zero overlap with mobile nav */
+    border-top: 4px solid var(--theme-header-border, gold) !important;
+    text-align: center !important;
+  }
+
+  .footer-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 20px !important;
+    max-width: 520px !important;
+    margin: 0 auto !important;
+  }
+
+  .footer-box {
+    width: 100% !important;
+    background: rgba(0, 0, 0, 0.16) !important;
+    border-radius: 12px !important;
+    padding: 16px 14px !important;
+    border: 1px solid rgba(255, 215, 0, 0.25) !important;
+    box-sizing: border-box !important;
+  }
+
+  .footer-box h4 {
+    color: #FFD700 !important;
+    font-size: 20px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .footer-box p {
+    font-size: 14.5px !important;
+    line-height: 1.6 !important;
+    margin: 4px 0 !important;
+  }
+
+  .phone {
+    font-size: 21px !important;
+    font-weight: bold !important;
+    color: #FFD700 !important;
+    display: inline-block !important;
+    margin-top: 4px !important;
+  }
+
   /* Show Mobile Bottom Navigation */
   .mobile-bottom-nav {
-    display: flex;
+    display: flex !important;
   }
 
   /* Modals on Mobile: Native Mobile Sheet Feel */
   .modal-window {
     max-width: 95vw !important;
-    max-height: 88vh;
-    border-radius: 14px;
-    padding: 16px;
-    margin: auto 8px;
+    max-height: 88vh !important;
+    border-radius: 14px !important;
+    padding: 16px !important;
+    margin: auto 8px !important;
   }
 
   .modal-title-bar h3 {
-    font-size: 16px;
+    font-size: 16px !important;
   }
 
   .form-grid-2 {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
   }
 
   .modal-btn-row {
-    flex-direction: column-reverse;
-    gap: 8px;
+    flex-direction: column-reverse !important;
+    gap: 8px !important;
   }
 
   .modal-btn-row button {
-    width: 100%;
-    min-height: 44px;
-  }
-
-  /* Footer on Mobile */
-  footer {
-    padding: 24px 14px;
-    margin-top: 30px;
-    text-align: center;
-  }
-
-  .footer-container {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .footer-box h4 {
-    font-size: 20px;
-  }
-
-  .phone {
-    font-size: 20px;
+    width: 100% !important;
+    min-height: 44px !important;
   }
 }
 
-/* Extra small screens (<= 400px) */
-@media (max-width: 400px) {
+/* Extra small screens (<= 380px) */
+@media (max-width: 380px) {
   .brand h1 {
-    font-size: 21px;
+    font-size: 26px !important;
+  }
+
+  .logo {
+    width: 54px !important;
+    height: 54px !important;
   }
 
   .item-english {
-    font-size: 13.5px;
+    font-size: 13.5px !important;
   }
 
   .item-telugu {
-    font-size: 12px;
+    font-size: 12px !important;
   }
 
   .item-price-part {
-    font-size: 13.5px;
+    font-size: 13px !important;
   }
 
-  .admin-actions {
-    grid-template-columns: 1fr;
+  .menu-side-image-card {
+    width: 74px !important;
+    height: 66px !important;
+    min-width: 74px !important;
+  }
+
+  .menu-side-image-card.round {
+    width: 68px !important;
+    height: 68px !important;
+    min-width: 68px !important;
   }
 }
