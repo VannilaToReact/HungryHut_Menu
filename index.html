@@ -21,11 +21,8 @@
        TOP RESTAURANT HEADER (EXACT AUTHENTIC HUNGRY HUT BRAND)
        Clicking anywhere on the brand/logo opens the Admin Portal
        ========================================================================== -->
-  <header style="position: relative;">
-    <button type="button" class="header-admin-quick-btn" id="headerAdminQuickBtn" title="Admin Portal Login" style="position: absolute; right: 16px; top: 16px; background: rgba(0,0,0,0.35); border: 1.5px solid #FFD700; color: #FFD700; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; z-index: 20;">
-      👑 Admin Login
-    </button>
-    <div class="header-container" id="headerBrand" title="Click Hungry Hut to open Admin Portal">
+  <header>
+    <div class="header-container" id="headerBrand" title="Hungry Hut Restaurant & Cafe">
       <img src="images/logo.png" class="logo" alt="Hungry Hut Logo">
       <div class="brand">
         <h1>Hungry Hut</h1>
@@ -56,7 +53,6 @@
       <button type="button" class="cat-pill" data-cat="Veg Starters">🥗 Veg Starters</button>
       <button type="button" class="cat-pill" data-cat="Veg Curry Items">🍛 Veg Curries</button>
       <button type="button" class="cat-pill" data-cat="Non-Veg Starters">🍗 Non-Veg Starters</button>
-      <button type="button" class="cat-pill cat-pill-admin" id="catNavAdminBtn" style="background: linear-gradient(135deg, #8B0000, #58111A); color: #FFD700; font-weight: 700; border: 1.5px solid #FFD700;">👑 Admin</button>
     </div>
   </div>
 
@@ -555,9 +551,9 @@
       <span class="nav-icon">📍</span>
       <span class="nav-label">Visit Us</span>
     </a>
-    <button type="button" class="mobile-nav-item" id="navAdminBtn">
-      <span class="nav-icon">👑</span>
-      <span class="nav-label" id="navAdminLabel">Admin</span>
+    <button type="button" class="mobile-nav-item" id="navAdminBtn" title="Hungry Hut Details">
+      <span class="nav-icon" id="navAdminIcon">🍽️</span>
+      <span class="nav-label" id="navAdminLabel">Hungry Hut</span>
     </button>
   </nav>
 

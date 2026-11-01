@@ -127,8 +127,6 @@
   // DOM Elements Cache
   const elements = {
     headerBrand: document.getElementById('headerBrand'),
-    headerAdminQuickBtn: document.getElementById('headerAdminQuickBtn'),
-    catNavAdminBtn: document.getElementById('catNavAdminBtn'),
     adminToolbar: document.getElementById('adminToolbar'),
     adminLoggedInEmailDisplay: document.getElementById('adminLoggedInEmailDisplay'),
     adminLogoutBtn: document.getElementById('adminLogoutBtn'),
@@ -146,6 +144,10 @@
 
     page1Container: document.getElementById('page1Container'),
     page2Container: document.getElementById('page2Container'),
+
+    // Footer & Secret Trigger
+    footerDisplayTitle: document.getElementById('footerDisplayTitle'),
+    footerBrandBox: document.getElementById('footerBrandBox'),
 
     // Login Modal
     loginModal: document.getElementById('loginModal'),
@@ -250,7 +252,8 @@
     mobileBottomNav: document.getElementById('mobileBottomNav'),
     navCategoriesBtn: document.getElementById('navCategoriesBtn'),
     navAdminBtn: document.getElementById('navAdminBtn'),
-    navAdminLabel: document.getElementById('navAdminLabel')
+    navAdminLabel: document.getElementById('navAdminLabel'),
+    navAdminIcon: document.getElementById('navAdminIcon')
   };
 
   /**
@@ -529,16 +532,6 @@
     elements.categoryNavBar.addEventListener('click', (e) => {
       const pill = e.target.closest('.cat-pill');
       if (!pill) return;
-
-      if (pill.id === 'catNavAdminBtn' || pill.classList.contains('cat-pill-admin')) {
-        if (!state.isAdmin) {
-          openLoginModal();
-        } else {
-          showToast('👑 Admin Mode is active! Manage products using toolbar.', 'ℹ️');
-          if (elements.adminToolbar) elements.adminToolbar.scrollIntoView({ behavior: 'smooth' });
-        }
-        return;
-      }
 
       elements.categoryNavBar.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
@@ -1570,7 +1563,10 @@
       elements.adminToolbar.classList.toggle('active', state.isAdmin);
     }
     if (elements.navAdminLabel) {
-      elements.navAdminLabel.textContent = state.isAdmin ? 'Admin (Active)' : 'Admin';
+      elements.navAdminLabel.textContent = state.isAdmin ? 'Admin Tools' : 'Hungry Hut';
+    }
+    if (elements.navAdminIcon) {
+      elements.navAdminIcon.textContent = state.isAdmin ? '👑' : '🍽️';
     }
     const email = MenuService.getStoredAdminEmail();
     if (elements.adminLoggedInEmailDisplay) {
@@ -1583,10 +1579,9 @@
   // ==========================================================================
 
   function bindEvents() {
-    // Header Quick Admin Button
-    if (elements.headerAdminQuickBtn) {
-      elements.headerAdminQuickBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+    // Secret Trigger 1: Clicking anywhere on the Hungry Hut Header brand/details
+    if (elements.headerBrand) {
+      elements.headerBrand.addEventListener('click', () => {
         if (!state.isAdmin) {
           openLoginModal();
         } else {
@@ -1596,13 +1591,26 @@
       });
     }
 
-    // Header Brand Click -> Admin Portal or highlight toolbar
-    elements.headerBrand.addEventListener('click', () => {
-      if (!state.isAdmin) {
-        openLoginModal();
-      } else {
-        showToast('👑 Admin Mode is active! Manage products, theme, and account using the toolbar.', 'ℹ️');
-        elements.adminToolbar.scrollIntoView({ behavior: 'smooth' });
+    // Secret Trigger 2: Clicking the Footer Hungry Hut Title
+    if (elements.footerDisplayTitle) {
+      elements.footerDisplayTitle.addEventListener('click', () => {
+        if (!state.isAdmin) {
+          openLoginModal();
+        } else {
+          if (elements.adminToolbar) elements.adminToolbar.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+
+    // Secret Trigger 3: Secret keyboard shortcut Ctrl+Shift+A or Alt+A
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') || (e.altKey && e.key.toLowerCase() === 'a')) {
+        e.preventDefault();
+        if (!state.isAdmin) {
+          openLoginModal();
+        } else {
+          if (elements.adminToolbar) elements.adminToolbar.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     });
 
