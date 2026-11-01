@@ -1,434 +1,474 @@
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Hungry Hut Restaurant & Cafe</title>
-
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
-scroll-behavior:smooth;
-}
-
-body{
-background:#fff8f0;
-color:#222;
-}
-
-/* HEADER */
-
-header{
-
-background:linear-gradient(135deg,#7a0000,#b30000);
-
-padding:20px;
-
-border-bottom:4px solid gold;
-
-color:white;
-
-}
-
-.header-container{
-
-max-width:1300px;
-
-margin:auto;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-gap:20px;
-
-flex-wrap:wrap;
-
-text-align:center;
-
-}
-
-.logo{
-
-width:110px;
-
-height:110px;
-
-object-fit:contain;
-
-background:white;
-
-padding:8px;
-
-border-radius:50%;
-
-}
-
-.brand h1{
-
-font-size:55px;
-
-font-weight:bold;
-
-}
-
-.brand h3{
-
-color:#FFD700;
-
-font-size:24px;
-
-letter-spacing:5px;
-
-margin:8px 0;
-
-}
-
-.menu-tag{
-
-display:inline-block;
-
-padding:10px 22px;
-
-background:white;
-
-color:#8b0000;
-
-border-radius:30px;
-
-font-weight:bold;
-
-}
-
-/* MAIN */
-
-main{
-
-padding:40px 15px;
-
-}
-
-main h4{
-
-text-align:center;
-
-font-size:34px;
-
-color:#8b0000;
-
-margin-bottom:35px;
-
-}
-
-.menu-container{
-
-display:grid;
-
-grid-template-columns:repeat(2,1fr);
-
-gap:25px;
-
-max-width:1400px;
-
-margin:auto;
-
-}
-
-.menu-card{
-
-background:white;
-
-border-radius:15px;
-
-overflow:hidden;
-
-box-shadow:0 8px 20px rgba(0,0,0,.15);
-
-transition:.3s;
-
-}
-
-.menu-card:hover{
-
-transform:translateY(-8px);
-
-}
-
-.menu-card img{
-
-width:100%;
-
-display:block;
-
-}
-
-/* FOOTER */
-
-footer{
-
-margin-top:50px;
-
-background:linear-gradient(135deg,#5c0000,#990000);
-
-color:white;
-
-padding:35px 20px;
-
-border-top:4px solid gold;
-
-}
-
-.footer-container{
-
-max-width:1200px;
-
-margin:auto;
-
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
-
-flex-wrap:wrap;
-
-gap:30px;
-
-}
-
-.footer-box{
-
-flex:1;
-
-min-width:250px;
-
-}
-
-.footer-box h4{
-
-color:#FFD700;
-
-margin-bottom:10px;
-
-font-size:24px;
-
-}
-
-.footer-box p{
-
-font-size:18px;
-
-line-height:1.8;
-
-}
-
-.phone{
-
-font-size:30px;
-
-font-weight:bold;
-
-color:#FFD700;
-
-}
-
-/* TABLET */
-
-@media(max-width:1024px){
-
-.brand h1{
-
-font-size:42px;
-
-}
-
-.brand h2{
-
-font-size:20px;
-
-}
-
-.menu-container{
-
-grid-template-columns:repeat(2,1fr);
-
-}
-
-.logo{
-
-width:90px;
-
-height:90px;
-
-}
-
-}
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-.header-container{
-
-flex-direction:column;
-
-}
-
-.brand h1{
-
-font-size:34px;
-
-}
-
-.brand h3{
-
-font-size:18px;
-
-letter-spacing:2px;
-
-}
-
-.logo{
-
-width:80px;
-
-height:80px;
-
-}
-
-.menu-tag{
-
-font-size:13px;
-
-padding:8px 15px;
-
-}
-
-main h4{
-
-font-size:26px;
-
-}
-
-.menu-container{
-
-grid-template-columns:1fr;
-
-}
-
-.footer-container{
-
-flex-direction:column;
-
-text-align:center;
-
-}
-
-.phone{
-
-font-size:24px;
-
-}
-
-.footer-box p{
-
-font-size:16px;
-
-}
-
-}
-
-</style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hungry Hut - Authentic Menu</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽️</text></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Marcellus&family=Noto+Sans+Telugu:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<header>
+  <!-- ==========================================================================
+       TOP RESTAURANT HEADER
+       Clicking the logo opens the Admin Portal
+       ========================================================================== -->
+  <!-- ==========================================================================
+       TOP RESTAURANT NAVBAR (EXACT ORIGINAL NAVBAR)
+       Clicking anywhere on the brand/logo opens the Admin Portal
+       ========================================================================== -->
+  <header>
+    <div class="header-container" id="headerBrand" title="Click Hungry Hut to open Admin Portal">
+      <img src="images/logo.png" class="logo" alt="Hungry Hut Logo">
+      <div class="brand">
+        <h1>Hungry Hut</h1>
+        <h3>RESTAURANT & CAFE</h3>
+        <div class="menu-tag">
+          TIFFINS • BIRYANI • IRANI CHAI • SNACKS
+        </div>
+      </div>
+    </div>
+  </header>
 
-<div class="header-container">
+  <!-- Welcome Subheading Banner -->
+  <div class="welcome-banner">
+    <h2>🍽️ Welcome to Hungry Hut Menu</h2>
+  </div>
 
-<img src="file_00000000da048208805ca7192233faf9.png" class="logo" alt="Hungry Hut">
+  <!-- ==========================================================================
+       ADMIN TOOLBAR (ONLY ACTIVE WHEN LOGGED IN)
+       ========================================================================== -->
+  <div class="admin-toolbar" id="adminToolbar">
+    <div class="admin-status">
+      <span class="admin-badge">ADMIN</span>
+      <span>Logged in as <strong>admin@hungryhut.com</strong></span>
+    </div>
+    <div class="admin-actions">
+      <button class="btn-admin btn-admin-add" id="adminAddDishBtn">✨ + Add Product</button>
+      <button class="btn-admin btn-admin-discount" id="adminDiscountBtn">🏷️ Discounts</button>
+      <button class="btn-admin btn-admin-theme" id="adminThemeBtn" style="background: #2563eb; color: #fff;">🎨 Color Theme (60+)</button>
+      <button class="btn-admin btn-admin-footer" id="adminFooterBtn" style="background: #059669; color: #fff;">📝 Edit Footer</button>
+      <button class="btn-admin btn-admin-manage" id="adminManageBtn" style="background: #d97706; color: #fff;">📋 Remove / Manage Dishes</button>
+      <button class="btn-admin btn-admin-logout" id="adminResetBtn" title="Reset all changes back to original 40 dishes">🔄 Reset Defaults</button>
+      <button class="btn-admin btn-admin-logout" id="adminLogoutBtn">🚪 Logout</button>
+    </div>
+  </div>
 
-<div class="brand">
+  <!-- ==========================================================================
+       MAIN MENU CONTAINER (PAGE 1 & PAGE 2 SIDE BY SIDE)
+       ========================================================================== -->
+  <div class="menu-container">
 
-<h1>Hungry Hut</h1>
+    <!-- PAGE 1 CARD: Veg Biryani, Fried Rice Items, Non-Veg Biryani -->
+    <div class="menu-card page-1" id="menuPage1Card">
+      <div class="card-torn-border-top"></div>
+      <div class="card-inner-content" id="page1Container">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+      <div class="card-torn-border-bottom"></div>
+    </div>
 
-<h3>RESTAURANT & CAFE</h3>
+    <!-- PAGE 2 CARD: Veg Starters, Veg Curry Items, Non-Veg Starters -->
+    <div class="menu-card page-2" id="menuPage2Card">
+      <div class="card-torn-border-top"></div>
+      <div class="card-inner-content" id="page2Container">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+      <div class="card-torn-border-bottom"></div>
+    </div>
 
-<div class="menu-tag">
+  </div>
 
-TIFFINS • BIRYANI • IRANI CHAI • SNACKS
+  <!-- ==========================================================================
+       MODAL 1: ADMIN LOGIN
+       Credentials read dynamically from .env:
+       admin@hungryhut.com / @admin(hungryhut)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="loginModal" role="dialog" aria-modal="true">
+    <div class="modal-window" style="max-width: 420px;">
+      <div class="modal-title-bar">
+        <h3>🔒 Hungry Hut Admin Portal</h3>
+        <button class="modal-close-icon" id="closeLoginModalBtn">✕</button>
+      </div>
 
-</div>
+      <form id="loginForm">
+        <div class="modal-content-body">
+          <p style="font-size: 13.5px; color: #555; margin-bottom: 16px;">
+            Please sign in with your administrative credentials to manage products, update pricing, and configure discounts.
+          </p>
 
-</div>
+          <div id="loginErrorMsg" style="display: none; background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 14px;">
+            Invalid email or password.
+          </div>
 
-</div>
+          <div class="form-field">
+            <label for="loginEmailInput">Admin Email</label>
+            <input type="email" id="loginEmailInput" placeholder="admin@hungryhut.com" required>
+          </div>
 
-</header>
+          <div class="form-field">
+            <label for="loginPasswordInput">Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="loginPasswordInput" placeholder="••••••••••••" required>
+              <button type="button" class="toggle-password-btn" id="togglePasswordBtn" title="Show/Hide Password" aria-label="Toggle password visibility">
+                <svg viewBox="0 0 24 24" class="eye-icon eye-open" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg viewBox="0 0 24 24" class="eye-icon eye-closed" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
 
-<main>
+        <div class="modal-btn-row">
+          <button type="submit" class="btn-primary-action">Login to Admin</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-<h4>🍽️ Welcome to Hungry Hut Menu</h4>
+  <!-- ==========================================================================
+       MODAL 2: ADD / EDIT DISH
+       Only accessible to Admin
+       ========================================================================== -->
+  <div class="modal-backdrop" id="dishModal" role="dialog" aria-modal="true">
+    <div class="modal-window">
+      <div class="modal-title-bar">
+        <h3 id="dishModalTitle">✨ Add New Product</h3>
+        <button class="modal-close-icon" id="closeDishModalBtn">✕</button>
+      </div>
 
-<div class="menu-container">
+      <form id="dishForm">
+        <div class="modal-content-body">
+          <input type="hidden" id="dishIdInput">
 
-<div class="menu-card">
+          <!-- English & Telugu Names -->
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="dishNameInput">Dish Name (English) *</label>
+              <input type="text" id="dishNameInput" placeholder="e.g. Gongura Mutton Biryani" required>
+            </div>
+            <div class="form-field">
+              <label for="dishTeluguInput">Telugu Name (తెలుగు)</label>
+              <input type="text" id="dishTeluguInput" placeholder="e.g. గోంగూర మటన్ బిర్యానీ">
+            </div>
+          </div>
 
-<img src="Hut.jpeg" alt="Menu Page 1">
+          <!-- Category & Page -->
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="dishCategorySelect">Category *</label>
+              <select id="dishCategorySelect" required>
+                <!-- Filled dynamically -->
+              </select>
+              <input 
+                type="text" 
+                id="dishNewCategoryInput" 
+                placeholder="Type new category..." 
+                style="display: none; margin-top: 6px;"
+              >
+            </div>
 
-</div>
+            <div class="form-field">
+              <label for="dishPageSelect">Menu Page Placement</label>
+              <select id="dishPageSelect">
+                <option value="1">Page 1 (Biryanis & Fried Rice)</option>
+                <option value="2">Page 2 (Starters & Curries)</option>
+              </select>
+            </div>
+          </div>
 
-<div class="menu-card">
+          <!-- Price & Discount % -->
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="dishPriceInput">Price in ₹ *</label>
+              <input type="number" id="dishPriceInput" placeholder="220" min="1" step="1" required>
+            </div>
+            <div class="form-field">
+              <label for="dishDiscountInput">Discount % (Optional)</label>
+              <input type="number" id="dishDiscountInput" placeholder="0" min="0" max="100" value="0">
+            </div>
+          </div>
 
-<img src="Hut1.jpeg" alt="Menu Page 2">
+          <!-- Food Dietary Type -->
+          <div class="form-field">
+            <label for="dishTypeSelect">Dietary Food Type</label>
+            <select id="dishTypeSelect">
+              <option value="veg">🟢 Pure Veg</option>
+              <option value="non-veg">🔴 Non-Veg</option>
+              <option value="egg">🟡 Egg</option>
+            </select>
+          </div>
 
-</div>
+          <!-- Dish Photo Preset -->
+          <div class="form-field">
+            <label>Select Culinary Photo Preset</label>
+            <div class="image-picker-grid" id="imagePresetGrid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
 
-</div>
+        <div class="modal-btn-row">
+          <button type="button" class="btn-cancel-action" id="cancelDishModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary-action">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-</main>
+  <!-- ==========================================================================
+       MODAL 3: BULK DISCOUNTS
+       ========================================================================== -->
+  <div class="modal-backdrop" id="discountModal" role="dialog" aria-modal="true">
+    <div class="modal-window" style="max-width: 440px;">
+      <div class="modal-title-bar">
+        <h3>🏷️ Configure Menu Discounts</h3>
+        <button class="modal-close-icon" id="closeDiscountModalBtn">✕</button>
+      </div>
 
-<footer>
+      <form id="discountForm">
+        <div class="modal-content-body">
+          <div class="form-field">
+            <label for="discountPercentInput">Discount Percentage (%)</label>
+            <input type="number" id="discountPercentInput" placeholder="e.g. 10 or 15 (0 to remove)" min="0" max="100" required>
+          </div>
 
-<div class="footer-container">
+          <div class="form-field">
+            <label for="discountScopeSelect">Apply Discount To:</label>
+            <select id="discountScopeSelect">
+              <option value="all">Entire Menu (All Dishes)</option>
+              <option value="biryani">All Biryani Items</option>
+              <option value="veg">Veg Items Only</option>
+              <option value="non-veg">Non-Veg Items Only</option>
+            </select>
+          </div>
+        </div>
 
-<div class="footer-box">
+        <div class="modal-btn-row">
+          <button type="button" class="btn-cancel-action" id="cancelDiscountModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary-action">Apply Discounts</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-<h4>📍 Visit Us</h4>
+  <!-- ==========================================================================
+       MODAL 4: EDIT FOOTER DETAILS (ADMIN ONLY)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="footerModal" role="dialog" aria-modal="true">
+    <div class="modal-window">
+      <div class="modal-title-bar">
+        <h3>📝 Edit Restaurant Footer Information</h3>
+        <button class="modal-close-icon" id="closeFooterModalBtn">✕</button>
+      </div>
 
-<p>
+      <form id="footerForm">
+        <div class="modal-content-body">
+          <div class="form-field">
+            <label for="footerTitleInput">Restaurant Title & Brand Name</label>
+            <input type="text" id="footerTitleInput" placeholder="Hungry Hut Restaurant & Cafe" required>
+          </div>
 
-Near K. R. R. School, Kurnool to Nandyal Road, PANYAM, 518112
+          <div class="form-field">
+            <label for="footerTaglineInput">Restaurant Tagline / Description</label>
+            <input type="text" id="footerTaglineInput" placeholder="Authentic Dum Biryanis, Starters, Wok Rice & Curries">
+          </div>
 
-</p>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="footerPhoneInput">Contact Numbers</label>
+              <input type="text" id="footerPhoneInput" placeholder="85559 38190, 63044 54153" required>
+            </div>
+            <div class="form-field">
+              <label for="footerTimingsInput">Operating Timings</label>
+              <input type="text" id="footerTimingsInput" placeholder="Open Daily: 11:00 AM - 11:00 PM">
+            </div>
+          </div>
 
-</div>
+          <div class="form-field">
+            <label for="footerAddressInput">Restaurant Address / Location</label>
+            <textarea id="footerAddressInput" rows="2" placeholder="Near K. R. R. School, Kurnool to Nandyal Road, PANYAM, 518112" required></textarea>
+          </div>
 
-<div class="footer-box">
+          <div class="form-field">
+            <label for="footerServicesInput">Services Offered</label>
+            <input type="text" id="footerServicesInput" placeholder="Dine-In • Takeaway • Bulk Party Orders">
+          </div>
+        </div>
 
-<h4>📞 Contact : <p class="phone">
+        <div class="modal-btn-row">
+          <button type="button" class="btn-cancel-action" id="cancelFooterModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary-action">Confirm & Save Footer</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-85559 38190, 63044 54153
+  <!-- ==========================================================================
+       MODAL 5: COLOR THEME CUSTOMIZATION (60+ COLORS)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="themeModal" role="dialog" aria-modal="true">
+    <div class="modal-window" style="max-width: 680px;">
+      <div class="modal-title-bar">
+        <h3>🎨 Customize Menu Color Theme</h3>
+        <button class="modal-close-icon" id="closeThemeModalBtn">✕</button>
+      </div>
 
-</p> </h4>
+      <div class="modal-content-body" style="max-height: 70vh; overflow-y: auto;">
+        <!-- SECTION 1: HEADER & PRIMARY ACCENT COLOR (60 CURATED COLORS) -->
+        <div style="margin-bottom: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+            <label style="font-weight: 700; color: #222; font-size: 14px;">
+              1. Choose Header / Theme Color (Replaces Red - 60 Colors Suggested):
+            </label>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 12px; color: #666;">Or Custom:</span>
+              <input type="color" id="customHeaderPicker" value="#800000" style="width: 32px; height: 26px; border: none; cursor: pointer; border-radius: 4px;">
+            </div>
+          </div>
 
+          <div class="theme-color-grid" id="themeColorGrid">
+            <!-- 60 curated colors populated via app.js -->
+          </div>
+        </div>
 
-</div>
+        <!-- SECTION 2: BACKGROUND / PAGE SURFACE COLOR -->
+        <div style="margin-bottom: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+            <label style="font-weight: 700; color: #222; font-size: 14px;">
+              2. Choose Background Color (Replaces White / Cream):
+            </label>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 12px; color: #666;">Or Custom:</span>
+              <input type="color" id="customBgPicker" value="#fff8f0" style="width: 32px; height: 26px; border: none; cursor: pointer; border-radius: 4px;">
+            </div>
+          </div>
 
-</div>
+          <div class="theme-bg-grid" id="themeBgGrid">
+            <!-- Curated background tones populated via app.js -->
+          </div>
+        </div>
 
-</footer>
+        <!-- SECTION 3: LIVE MINI-PREVIEW -->
+        <div style="margin-bottom: 10px;">
+          <label style="font-weight: 700; color: #222; font-size: 13.5px; display: block; margin-bottom: 6px;">
+            Theme Live Preview:
+          </label>
+          <div id="themePreviewBox" class="theme-preview-box">
+            <div id="prevHeader" style="background: linear-gradient(135deg, #7a0000, #b30000); padding: 12px; text-align: center; color: white; border-bottom: 3px solid gold; border-radius: 8px 8px 0 0;">
+              <div style="font-size: 18px; font-weight: bold;">🍽️ Hungry Hut</div>
+              <div style="font-size: 10px; color: #FFD700; letter-spacing: 2px;">RESTAURANT & CAFE</div>
+            </div>
+            <div id="prevBody" style="background: #fff8f0; padding: 16px; border-radius: 0 0 8px 8px; border: 1px solid #ddd; border-top: none;">
+              <div style="background: #ffffff; padding: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                <div id="prevHeading" style="color: #8B0000; font-weight: bold; font-size: 16px; margin-bottom: 6px;">Veg Biryani</div>
+                <div style="display: flex; justify-content: space-between; font-size: 13.5px;">
+                  <span>Kaju Biryani - కాజు బిర్యానీ</span>
+                  <span style="font-weight: bold;">: 220/-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <div class="modal-btn-row" style="justify-content: space-between;">
+        <button type="button" class="btn-cancel-action" id="resetThemeBtn" style="color: #b91c1c;">🔄 Reset to Default Red</button>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-cancel-action" id="cancelThemeModalBtn">Cancel</button>
+          <button type="button" class="btn-primary-action" id="applyThemeBtn">Confirm & Apply Theme</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 6: REMOVE / MANAGE PRODUCTS
+       ========================================================================== -->
+  <div class="modal-backdrop" id="manageModal" role="dialog" aria-modal="true">
+    <div class="modal-window" style="max-width: 620px;">
+      <div class="modal-title-bar">
+        <h3>📋 Manage & Remove Menu Products</h3>
+        <button class="modal-close-icon" id="closeManageModalBtn">✕</button>
+      </div>
+
+      <div class="modal-content-body">
+        <input 
+          type="text" 
+          id="manageSearchInput" 
+          placeholder="Type to filter products by name or category..." 
+          style="width: 100%; padding: 9px 14px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 14px; font-size: 14px;"
+        >
+        <div id="manageProductsList" style="max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+
+      <div class="modal-btn-row">
+        <button type="button" class="btn-cancel-action" id="closeManageModalBottomBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 7: ADMIN CONFIRMATION DIALOG
+       Custom luxury modal for confirming theme, footer, price, and dish deletions
+       ========================================================================== -->
+  <div class="modal-backdrop" id="confirmModal" role="dialog" aria-modal="true" style="z-index: 100000;">
+    <div class="modal-window" style="max-width: 440px; text-align: center; border: 2px solid gold; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      <div style="font-size: 40px; margin-bottom: 8px;" id="confirmIcon">👑</div>
+      <h3 id="confirmTitle" style="font-family: 'Cinzel', serif; color: var(--theme-accent-color, #8B0000); margin-bottom: 8px; font-size: 20px;">
+        Admin Confirmation
+      </h3>
+      <p id="confirmMessage" style="color: #444; font-size: 14.5px; line-height: 1.5; margin-bottom: 14px;">
+        Are you sure you want to proceed with this update?
+      </p>
+      <div id="confirmDetailsBox" style="background: rgba(0,0,0,0.04); border-radius: 8px; padding: 12px; margin-bottom: 18px; font-size: 13px; text-align: left; display: none;"></div>
+      <div class="modal-btn-row" style="justify-content: center; gap: 12px;">
+        <button type="button" class="btn-cancel-action" id="cancelConfirmBtn" style="min-width: 100px;">Cancel</button>
+        <button type="button" class="btn-primary-action" id="acceptConfirmBtn" style="min-width: 130px; background: #16a34a;">Confirm & Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       AUTHENTIC RESTAURANT FOOTER (INCLUDES RESTAURANT INFO BOX)
+       ========================================================================== -->
+  <footer id="restaurantFooter">
+    <div class="footer-container">
+      <div class="footer-box" id="footerBrandBox">
+        <h4 id="footerDisplayTitle">🍽️ Hungry Hut Restaurant & Cafe</h4>
+        <p id="footerDisplayTagline">Authentic Dum Biryanis, Starters, Wok Rice & Curries</p>
+        <p id="footerDisplayServices" style="font-size: 14px; color: #FFD700; margin-top: 6px; font-weight: 600;">Dine-In • Takeaway • Bulk Party Orders</p>
+        <p id="footerDisplayTimings" style="font-size: 13.5px; opacity: 0.9; margin-top: 4px;">Open Daily: 11:00 AM - 11:00 PM</p>
+      </div>
+
+      <div class="footer-box">
+        <h4>📍 Visit Us</h4>
+        <p id="footerDisplayAddress">Near K. R. R. School, Kurnool to Nandyal Road, PANYAM, 518112</p>
+      </div>
+
+      <div class="footer-box">
+        <h4>📞 Contact : <span class="phone" id="footerDisplayPhone">85559 38190, 63044 54153</span></h4>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="menuData.js"></script>
+  <script src="app.js"></script>
 </body>
-
 </html>

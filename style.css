@@ -1,0 +1,1031 @@
+/* ==========================================================================
+   HUNGRY HUT - AUTHENTIC RESTAURANT MENU STYLESHEET
+   Recreates the exact authentic printed menu card aesthetic from original photos
+   with high-resolution generated dish images and administrative management.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Marcellus&family=Noto+Sans+Telugu:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  --theme-header-bg: #800000;
+  --theme-header-grad: #b30000;
+  --theme-header-border: gold;
+  --theme-body-bg: #fff8f0;
+  --theme-card-bg: #fdfcf9;
+  --theme-text-color: #222222;
+  --theme-accent-color: #8B0000;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit', Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: var(--theme-body-bg, #fff8f0);
+  background-image: 
+    radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--theme-body-bg, #fff8f0), rgba(0,0,0,0.03));
+  background-size: 20px 20px, 100% 100%;
+  color: var(--theme-text-color, #222);
+  min-height: 100vh;
+  padding-bottom: 50px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ==========================================================================
+   HEADER & NAVBAR (EXACT AUTHENTIC HUNGRY HUT NAVBAR)
+   ========================================================================== */
+header {
+  background: linear-gradient(135deg, var(--theme-header-bg, #7a0000), var(--theme-header-grad, #b30000));
+  padding: 20px;
+  border-bottom: 4px solid var(--theme-header-border, gold);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  position: relative;
+  z-index: 10;
+  transition: background 0.3s ease;
+}
+
+.header-container {
+  max-width: 1300px;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.header-container:hover {
+  transform: scale(1.02);
+}
+
+.logo {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  background: white;
+  padding: 8px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s ease;
+}
+
+.header-container:hover .logo {
+  transform: rotate(-3deg) scale(1.04);
+}
+
+.brand h1 {
+  font-size: 55px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #ffffff;
+  line-height: 1.1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.brand h3 {
+  color: #FFD700;
+  font-size: 24px;
+  letter-spacing: 5px;
+  margin: 8px 0;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.menu-tag {
+  display: inline-block;
+  padding: 10px 24px;
+  background: white;
+  color: #8b0000;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Welcome Subheading Banner */
+.welcome-banner {
+  text-align: center;
+  margin: 28px auto 12px;
+}
+
+.welcome-banner h2 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--theme-accent-color, #8b0000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  letter-spacing: 0.2px;
+  transition: color 0.3s ease;
+}
+
+/* ==========================================================================
+   ADMIN BAR (VISIBLE ONLY WHEN LOGGED IN)
+   ========================================================================== */
+.admin-toolbar {
+  background: #1e1114;
+  border-bottom: 2px solid #f5a623;
+  color: #fff;
+  padding: 10px 20px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.admin-toolbar.active {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-badge {
+  background: #f5a623;
+  color: #120508;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-admin {
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-admin-add {
+  background: #f5a623;
+  color: #1a080c;
+}
+.btn-admin-add:hover {
+  background: #ffb84d;
+}
+
+.btn-admin-discount {
+  background: #8B0000;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.btn-admin-discount:hover {
+  background: #a50000;
+}
+
+.btn-admin-logout {
+  background: transparent;
+  color: #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.btn-admin-logout:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* ==========================================================================
+   MENU CONTAINER (SIDE-BY-SIDE OR STACKED ON MOBILE)
+   ========================================================================== */
+.menu-container {
+  width: 96%;
+  max-width: 1440px;
+  margin: 35px auto;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+/* ==========================================================================
+   MENU CARDS (PAGE 1 & PAGE 2)
+   ========================================================================== */
+.menu-card {
+  background: var(--theme-card-bg, #fdfcf9);
+  background-image: 
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.9) 0%, rgba(246, 243, 237, 0.7) 100%),
+    repeating-linear-gradient(90deg, rgba(235, 230, 220, 0.15) 0px, rgba(235, 230, 220, 0.15) 1px, transparent 1px, transparent 32px);
+  border-radius: 16px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
+  flex: 1;
+  min-width: 480px;
+  max-width: 680px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e8e2d8;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease;
+}
+
+/* Authentic Torn Red Brush Borders (Top & Bottom) */
+.card-torn-border-top {
+  width: 100%;
+  height: 24px;
+  background: var(--theme-accent-color, #8B0000);
+  clip-path: polygon(
+    0% 0%, 100% 0%, 100% 65%,
+    97% 55%, 94% 75%, 90% 60%, 85% 85%, 80% 65%, 75% 78%,
+    70% 55%, 65% 80%, 60% 60%, 55% 75%, 50% 55%, 45% 80%,
+    40% 65%, 35% 75%, 30% 60%, 25% 80%, 20% 65%, 15% 75%,
+    10% 60%, 5% 75%, 0% 65%
+  );
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease;
+}
+
+.card-torn-border-bottom {
+  width: 100%;
+  height: 24px;
+  background: var(--theme-accent-color, #8B0000);
+  margin-top: auto;
+  clip-path: polygon(
+    0% 35%, 5% 25%, 10% 40%, 15% 25%, 20% 35%, 25% 20%,
+    30% 40%, 35% 25%, 40% 35%, 45% 20%, 50% 45%, 55% 25%,
+    60% 40%, 65% 20%, 70% 45%, 75% 22%, 80% 35%, 85% 15%,
+    90% 40%, 94% 25%, 97% 45%, 100% 35%, 100% 100%, 0% 100%
+  );
+  transition: background 0.3s ease;
+}
+
+.card-inner-content {
+  padding: 24px 32px 30px;
+}
+
+/* ==========================================================================
+   CATEGORY SECTIONS IN MENU CARD
+   ========================================================================== */
+.menu-category-block {
+  margin-bottom: 28px;
+}
+
+.menu-category-block:last-child {
+  margin-bottom: 10px;
+}
+
+/* Category Title Styling (Maroon/Red Script with Brush Underline) */
+.category-heading {
+  font-family: 'Marcellus', 'Cinzel', serif;
+  font-size: 29px;
+  font-weight: 700;
+  color: var(--theme-accent-color, #8B0000);
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.category-brush-underline {
+  height: 5px;
+  width: 140px;
+  background: var(--theme-accent-color, #8B0000);
+  margin-bottom: 14px;
+  border-radius: 3px;
+  clip-path: polygon(0% 20%, 15% 0%, 50% 40%, 85% 0%, 100% 30%, 95% 85%, 50% 60%, 10% 90%, 0% 60%);
+  transition: background 0.3s ease;
+}
+
+/* Category Layout (Text column + Image column) */
+.category-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.category-row.reverse {
+  flex-direction: row-reverse;
+}
+
+.category-items-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ==========================================================================
+   DISH ITEM ROW
+   Format: Name - Telugu Name : Price/-
+   ========================================================================== */
+.menu-item-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 16.5px;
+  line-height: 1.35;
+  padding: 3px 6px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+  position: relative;
+}
+
+.menu-item-row:hover {
+  background: rgba(139, 0, 0, 0.04);
+}
+
+.item-name-part {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+  padding-right: 10px;
+}
+
+.item-english {
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 17px;
+  letter-spacing: -0.2px;
+}
+
+.item-hyphen {
+  color: #555;
+  font-weight: 500;
+}
+
+.item-telugu {
+  font-family: 'Noto Sans Telugu', sans-serif;
+  color: #2b2b2b;
+  font-size: 15.5px;
+  font-weight: 600;
+}
+
+/* Food type dot */
+.type-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.type-dot.veg { background: #16a34a; }
+.type-dot.non-veg { background: #dc2626; }
+.type-dot.egg { background: #d97706; }
+
+/* Price Formatting */
+.item-price-part {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 17.5px;
+  color: #111;
+  white-space: nowrap;
+  font-feature-settings: "tnum";
+}
+
+.price-colon {
+  font-weight: 700;
+  margin-right: 2px;
+}
+
+/* Discount Display */
+.price-original-striked {
+  text-decoration: line-through;
+  color: #888;
+  font-size: 14.5px;
+  font-weight: 500;
+  margin-right: 3px;
+}
+
+.price-discounted {
+  color: #b91c1c;
+  font-weight: 800;
+}
+
+.discount-tag {
+  background: #dc2626;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  margin-left: 2px;
+  letter-spacing: 0.3px;
+}
+
+/* Admin Item Controls (Only visible when logged in) */
+.item-admin-actions {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.admin-active .item-admin-actions {
+  display: inline-flex;
+}
+
+.btn-row-action {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s ease;
+}
+
+.btn-row-action:hover {
+  background: #8B0000;
+  color: #fff;
+  border-color: #8B0000;
+}
+
+/* ==========================================================================
+   DISH PHOTO SIDE COLUMN
+   ========================================================================== */
+.category-images-col {
+  width: 135px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.menu-side-image-card {
+  width: 128px;
+  height: 104px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  border: 2px solid #fff;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.menu-side-image-card:hover {
+  transform: scale(1.06);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.menu-side-image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.menu-side-image-card.round {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+}
+
+/* ==========================================================================
+   MODALS (ADMIN LOGIN, ADD/EDIT DISH, DISCOUNT)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-window {
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 540px;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-backdrop.active .modal-window {
+  transform: translateY(0) scale(1);
+}
+
+.modal-title-bar {
+  background: #8B0000;
+  color: #fff;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title-bar h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-close-icon {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.modal-content-body {
+  padding: 22px;
+}
+
+.modal-btn-row {
+  padding: 14px 22px;
+  background: #f9f9f9;
+  border-top: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Forms */
+.form-field {
+  margin-bottom: 16px;
+}
+
+.form-field label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14.5px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: #8B0000;
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.15);
+}
+
+/* Password Field Wrapper & Eye Toggle */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.toggle-password-btn:hover {
+  color: #8B0000;
+  background: rgba(139, 0, 0, 0.08);
+}
+
+.toggle-password-btn svg {
+  display: block;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.image-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+  max-height: 140px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.image-picker-thumb {
+  aspect-ratio: 4/3;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.image-picker-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-picker-thumb.selected {
+  border-color: #8B0000;
+}
+
+/* Buttons */
+.btn-primary-action {
+  background: #8B0000;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s ease;
+}
+
+.btn-primary-action:hover {
+  background: #a50000;
+}
+
+.btn-cancel-action {
+  background: #e5e5e5;
+  color: #333;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-cancel-action:hover {
+  background: #d4d4d4;
+}
+
+/* Toast */
+.toast-notice {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #8B0000;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  font-size: 14.5px;
+  font-weight: 600;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideToast 0.3s ease;
+}
+
+@keyframes slideToast {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+@media (max-width: 768px) {
+  .header-brand-container {
+    gap: 14px;
+  }
+
+  .chef-logo-circle {
+    width: 68px;
+    height: 68px;
+    min-width: 68px;
+  }
+
+  .brand-name {
+    font-size: 30px;
+  }
+
+  .brand-subtext {
+    font-size: 11.5px;
+    letter-spacing: 2.5px;
+  }
+
+  .brand-tags-pill {
+    font-size: 9.5px;
+    padding: 3px 12px;
+  }
+
+  .welcome-banner h2 {
+    font-size: 20px;
+  }
+  
+  .menu-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+  }
+
+  .menu-card {
+    min-width: 95%;
+    max-width: 100%;
+  }
+
+  .card-inner-content {
+    padding: 18px 16px;
+  }
+
+  .menu-item-row {
+    font-size: 15px;
+  }
+
+  .item-english {
+    font-size: 15px;
+  }
+
+  .item-telugu {
+    font-size: 14px;
+  }
+
+  .category-images-col {
+    width: 95px;
+  }
+
+  .menu-side-image-card {
+    width: 90px;
+    height: 75px;
+  }
+
+  .menu-side-image-card.round {
+    width: 80px;
+    height: 80px;
+  }
+
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   AUTHENTIC RESTAURANT FOOTER
+   ========================================================================== */
+footer {
+  margin-top: 50px;
+  background: linear-gradient(135deg, var(--theme-header-bg, #5c0000), var(--theme-header-grad, #990000));
+  color: white;
+  padding: 35px 20px;
+  border-top: 4px solid var(--theme-header-border, gold);
+  transition: background 0.3s ease;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.footer-box {
+  flex: 1;
+  min-width: 250px;
+}
+
+.footer-box h4 {
+  color: #FFD700;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.footer-box p {
+  font-size: 16.5px;
+  line-height: 1.7;
+}
+
+.phone {
+  font-size: 26px;
+  font-weight: bold;
+  color: #FFD700;
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .phone {
+    font-size: 22px;
+  }
+
+  .footer-box p {
+    font-size: 16px;
+  }
+}
+
+/* ==========================================================================
+   THEME CUSTOMIZER STYLES (60 CURATED COLORS & BACKGROUNDS)
+   ========================================================================== */
+.theme-color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: 7px;
+  max-height: 190px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.color-swatch-item {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+
+.color-swatch-item:hover {
+  transform: scale(1.18);
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.color-swatch-item.active {
+  border-color: #111;
+  transform: scale(1.12);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111;
+}
+
+.theme-bg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 8px;
+  max-height: 125px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.bg-swatch-item {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid #ccc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease;
+}
+
+.bg-swatch-item:hover {
+  transform: scale(1.16);
+}
+
+.bg-swatch-item.active {
+  border-color: #111;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111;
+}
+
+.theme-preview-box {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================================================
+   MANAGE / REMOVE PRODUCTS LIST
+   ========================================================================== */
+.manage-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  gap: 12px;
+  transition: background 0.15s ease;
+}
+
+.manage-item-row:hover {
+  background: #fcfcfc;
+}
+
+.manage-item-info {
+  flex: 1;
+}
+
+.manage-item-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: #111;
+}
+
+.manage-item-meta {
+  font-size: 12.5px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.btn-remove-dish {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-remove-dish:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
